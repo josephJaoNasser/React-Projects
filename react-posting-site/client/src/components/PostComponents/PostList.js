@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-//import { TransitionGroup } from 'react-transition-group'
 import PropTypes from 'prop-types'
 
 //material ui
@@ -12,43 +11,44 @@ import {
 //redux
 import { connect } from 'react-redux'
 import { fetchPosts, deletePost } from '../../actions/postActions'
+
+//components
 import PostItem from './PostItem'
 
 //component
-const PostList = ({  
-  posts, 
-  fetchPosts,
-  deletePost,
-  isLoading
-}) => { 
-
+const PostList = (props) => { 
+  const {  
+    posts, 
+    fetchPosts,
+    deletePost,
+    isLoading
+  } = props
+  
   //---lifecycle functions ---
   useEffect(()=> {   
     const getPosts = async() => {
       await fetchPosts()
     }
     getPosts()
-    
-  },[])
+  },[fetchPosts])
 
   // --- html ---
-  return (    
+  return (   
     <>
-      { isLoading &&
-        <Slide
+      {
+        isLoading &&  (<Slide
           direction='down'
           in={isLoading}
           mountOnEnter
           unmountOnExit
         >
           <CircularProgress />
-        </Slide> 
-          
+        </Slide> )
       }
-      <List>
+      <List style={{marginTop:"1em"}}>
         { 
-          posts ?
-            posts.map((post,index) => (                         
+          posts?.length ?
+            posts.map((post) => (                         
               <PostItem    
                 key={post._id} 
                 post={post}  
@@ -59,9 +59,8 @@ const PostList = ({
           
           : <i>{ "No posts to show..." }</i>
         }
-      </List>    
-      
-    </>
+      </List>   
+    </> 
   )
 }
 

@@ -1,0 +1,77 @@
+const express = require('express')
+const router = express.Router()
+const bcrypt = require('bcryptjs')
+const { validateUser } = require('./validateUser')
+const config = require('config')
+const jwt = require('jsonwebtoken')
+const auth = require('../../middleware/auth')
+
+module.exports = router
+
+//user model
+const User = require('../../models/User')
+
+const isEmail = (input) =>{
+  const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;   
+  if(emailRegex.test(input)){
+    return true
+  }
+  return false
+}
+
+// @route POST api/auth
+// @desc authenticate the user
+// @access public
+router.post('/login', (req, res)=>{
+  
+  User.findOne(
+    !isEmail(req.body.username) ?
+    { uname: req.body.username } : { email: req.body.username } 
+  )
+  .then( user => {
+    if(!user) return res.status(400).json({ msg: `User isn't registered` })
+
+    //validate password
+    bcrypt.compare(req.body.password, user.pwd).then(isMatch => {
+      if(!isMatch){
+        return res.status(400).json({
+          msg: "Password is incorrect"
+        })
+      }
+
+      const payload = {
+        _id: user._id,
+        username: user.uname,
+        displayName: user.dname,
+        profile_image:user.profile_image,
+        bio: user.bio,
+        email: user.email
+      }
+      
+      jwt.sign(
+        { id: user._id },
+        config.get('jwtSecret'),
+        (err, token) =>{
+          if(err) throw err
+          res.status(201).json({
+            token,
+            success: true,
+            user: payload,
+            msg: 'You are now logged in!'
+          })
+        }
+      )
+    })
+  })  
+})
+
+// @route GET api/auth/user
+// @desc get user data
+// @access private
+router.get('/user',auth,(req,res)=>{
+  User.findById(req.user.id)
+    .select('-pwd -joinedOn')
+    .then(user => {
+      return res.json(user)
+    })
+})

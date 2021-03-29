@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const auth = require('../../middleware/auth')
 
 //post model
 const Post = require('../../models/Post')
@@ -15,22 +16,24 @@ router.get('/', async(req, res)=> {
 
 // @route POST api/posts
 // @desc create a post
-// @access public
-router.post('/', async(req, res)=> {
-  const newPost = new Post({
-    text: req.body.text,
-    user: !req.body.user ? {
-      _id: 1
-    }: req.body.user
-  })
+// @access private
+router.post('/', auth, async(req, res)=> {
+  User.findById(req.user.id)
+    .select('-pwd -joinedOn')
+    .then(user => {
+      const newPost = new Post({
+        text: req.body.text,
+        user: user
+      })
 
-  newPost.save().then(post => res.status(201).json({post}))
+      newPost.save().then(post => res.status(201).json({post}))
+    })  
 })
 
 // @route DELETE api/posts
 // @desc delete a post
-// @access public
-router.delete('/:id',async(req, res)=> {
+// @access private
+router.delete('/:id',auth,async(req, res)=> {
   Post.findById(req.params.id)
     .then(post => post.remove().then(()=> res.json({success:true, msg:'Item successfully deleted'})))
     .catch(err=>{

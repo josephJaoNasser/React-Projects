@@ -8,23 +8,22 @@ import {
   ListItemAvatar, 
   Avatar, 
   ListItemText,  
-  Container} from '@material-ui/core';
+} from '@material-ui/core';
 import { DeleteOutline } from '@material-ui/icons';
 
 const PostItem = ({post, onDelete}) => {
 
-  const profilImageUrl = `http://simple-posts-app.herokuapp.com/api/users/${post.user._id}/profile-images/${post.user.profile_image}?size=tiny`
+  const profilImageUrl = ``
 
   return (    
     <ListItem alignItems="flex-start" divider>
       <ListItemAvatar>
         <Avatar alt='' src={profilImageUrl}></Avatar>
       </ListItemAvatar>
-      {/* <h4 className="post-author">{post.user.username}</h4> */}
      
-      <Container>  
+      <div className="post-body">  
         <ListItemText
-          primary={post.user.username}
+          primary={post.user.username ?? ''}
           primaryTypographyProps={{variant:"subtitle2"}}
           secondary={
             <React.Fragment>
@@ -42,7 +41,7 @@ const PostItem = ({post, onDelete}) => {
               : null           
             : null
           }
-      </Container>
+      </div>
      
     
       <IconButton

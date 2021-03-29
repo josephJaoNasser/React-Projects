@@ -1,21 +1,19 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { Container }  from '@material-ui/core'
+import { CircularProgress } from '@material-ui/core';
 
 //components
-import PostList from '../PostComponents/PostList'
-import AddPost from '../PostComponents/AddPost';
-
-//context providers
-//import { PostContextProvider } from '../PostComponents/PostContextProvider'
+const PostList = lazy(()=> import('../PostComponents/PostList'))
+const AddPost = lazy(()=> import('../PostComponents/AddPost')) 
 
 const Home = () => {
   return (
     <div className="home-main-container">
       <Container maxWidth="md">
-        <AddPost/>          
-        <div className="post-list">
+        <Suspense fallback={<CircularProgress/>}>
+          <AddPost/>            
           <PostList />
-        </div>  
+        </Suspense>
       </Container>
       
     </div>
