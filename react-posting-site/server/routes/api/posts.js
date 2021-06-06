@@ -9,8 +9,9 @@ const Post = require('../../models/Post')
 // @desc get all posts
 // @access public
 router.get('/', async(req, res)=> {
+  //console.log('a')
   Post.find()
-    .sort({ date: -1 })
+    .sort({ createdAt: -1 })
     .then(posts => res.json(posts))
 })
 
@@ -35,7 +36,20 @@ router.post('/', auth, async(req, res)=> {
 // @access private
 router.delete('/:id',auth,async(req, res)=> {
   Post.findById(req.params.id)
-    .then(post => post.remove().then(()=> res.json({success:true, msg:'Item successfully deleted'})))
+    .then(post => {
+      if(req.user.id != post.user._id){
+        return res.status(401).json({
+          msg: "You are not allowed to delete this post because you are not the author."
+        })
+      }
+      
+      post.remove().then(()=> {
+        res.json({
+          success:true, 
+          msg:'Item successfully deleted'
+        })
+      })
+    })
     .catch(err=>{
       res.status(404).json({
         success: false,

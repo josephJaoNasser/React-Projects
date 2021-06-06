@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 //redux
@@ -8,8 +8,7 @@ import { createPost } from '../../actions/postActions'
 //material ui
 import {
   Button,
-  Paper,
-  InputBase,
+  TextField,
   Snackbar
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -22,19 +21,34 @@ const Alert = (props) => {
 /*=========== 
 component
 =============*/
-const AddPost = ({ createPost }) => {
+const AddPost = (props) => {
 
   const [text, setText] = useState('')
   const [message, setMessage] = useState({
     msg: '',
     success: true
   })
+
+  const {  
+    error,
+    createPost,
+    author
+  } = props
   
+  useEffect(() => {
+    if(error){
+      setMessage({
+        msg: error.msg ? error.msg : `Failed to add post (${error.status} error)`, 
+        success:false
+      })
+    }    
+  }, [error])
+  
+  //functions
   const resetMessage = () => {
     setMessage({...message, success:true})
   }
 
-  //functions
   const sendPost = (e) => {
     e.preventDefault();    
     if(!text){
@@ -45,9 +59,7 @@ const AddPost = ({ createPost }) => {
     const newPost = {
       _id: Math.random(),
       text: text,
-      user: {
-        _id: '1'
-      }
+      user: author
     }
     
     createPost(newPost)
@@ -58,25 +70,15 @@ const AddPost = ({ createPost }) => {
   return (
     <form className="addForm">
       <div className="form-control">
-        <Paper
-          elevation={0}
-          style={
-            {
-              backgroundColor:"#eee", 
-              padding: "10px", 
-              marginBottom: "1em"
-            }
-          }
-        >
-          <InputBase
-            placeholder="Say something..."
-            multiline
-            rows={5}
-            style={{width:"100%"}}
-            value={text}
-            onChange={e => setText(e.target.value)}
-          />
-        </Paper>
+      <TextField
+        placeholder="Say something..."
+        multiline
+        rows={5}
+        style={{width:"100%", marginBottom:"1.5em"}}
+        value={text}
+        onChange={e => setText(e.target.value)}
+        variant="outlined"
+      />
         
       </div> 
       <Button
@@ -104,5 +106,10 @@ AddPost.propTpyes = {
   createPost: PropTypes.func.isRequired
 }
 
+const mapStateToProps = (state) => ({
+  error: state.posts.error,
+  author: state.auth.user
+})
 
-export default connect(null, { createPost })(AddPost)
+
+export default connect(mapStateToProps, { createPost })(AddPost)

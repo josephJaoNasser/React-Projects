@@ -1,10 +1,33 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Button, Container } from '@material-ui/core'
 
-const Header = ({title}) => {
+//redux
+
+const Header = ({title, token, logout, justifyContent}) => {
   return (
     <header>
-      <h1 >{title}</h1>
+      <Container 
+        style={{
+          display: "flex", 
+          justifyContent: justifyContent
+        }}
+      >
+        <h2 >{title}</h2>
+        {
+          token &&
+            <Button
+              variant="outlined"
+              style={{alignSelf: 'center'}}
+              onClick={logout}
+            >
+              Logout
+            </Button>
+        }
+        
+      </Container>
+      
+        
     </header>
   )
 }
@@ -12,11 +35,12 @@ const Header = ({title}) => {
 //Define default props and prop types
 Header.defaultProps = {
   title: 'Post App',
-  words: ''
+  justifyContent: 'center'
 }
 
 Header.propTypes = {
   title: PropTypes.string,
+  justifyContent: PropTypes.string
 }
 
 export default Header

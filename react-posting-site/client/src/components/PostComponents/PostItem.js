@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import ImageGrid from './ImageGrid'
@@ -7,13 +8,16 @@ import {
   ListItem, 
   ListItemAvatar, 
   Avatar, 
-  ListItemText,  
+  ListItemText,
+  Link as MaterialUiLink
 } from '@material-ui/core';
 import { DeleteOutline } from '@material-ui/icons';
 
+//redux store
+import store from '../../store/Store'
 const PostItem = ({post, onDelete}) => {
 
-  const profilImageUrl = ``
+  const profilImageUrl = post.user.profile_image ? `/v1/users/${post.user._id}/profile-image/${post.user.profile_image}` : ''
 
   return (    
     <ListItem alignItems="flex-start" divider>
@@ -23,33 +27,44 @@ const PostItem = ({post, onDelete}) => {
      
       <div className="post-body">  
         <ListItemText
-          primary={post.user.username ?? ''}
+          primary={
+            <React.Fragment>
+              <MaterialUiLink 
+                color='inherit' 
+                component={Link}
+                to={`/${post.user.uname}`}
+              >
+                {post.user.dname ??  post.user.dname}
+              </MaterialUiLink>
+            </React.Fragment>
+          }
           primaryTypographyProps={{variant:"subtitle2"}}
           secondary={
             <React.Fragment>
-              <i>{moment(post.createdAt).fromNow()}</i>
+               { `@${post.user.uname} - ${moment(post.createdAt).fromNow()}` }        
             </React.Fragment>            
-          }          
+          }    
+          secondaryTypographyProps={{variant:"caption"}}      
         />
         <ListItemText 
           primary={post.text}
         />       
-         {post.media ?  
-            post.media.length ? 
-
+          {post.media?.length ?  
             <ImageGrid postid={ post._id} images={ post.media}/>
-              : null           
             : null
           }
       </div>
      
     
-      <IconButton
-        onClick={()=>onDelete(post._id)}
-        color="secondary"      
-      >
-        <DeleteOutline/>
-      </IconButton>
+      {
+        post.user._id === store.getState().auth.user._id &&
+        <IconButton
+          onClick={()=>onDelete(post._id)}
+          color="secondary"      
+        >
+          <DeleteOutline/>
+        </IconButton>
+      }
       
     </ListItem>
   )

@@ -27,9 +27,10 @@ const StepperControls = ({ canProceed, onNext, checkIfCanProceed }) => {
     setActiveStep(0);
   };
 
-  const handleNext = () => {
+  const handleNext = async() => {
     if( checkIfCanProceed ){
-      canProceed = checkIfCanProceed()        
+      canProceed = await checkIfCanProceed()    
+      console.log(canProceed)    
     }
     
     if(canProceed){

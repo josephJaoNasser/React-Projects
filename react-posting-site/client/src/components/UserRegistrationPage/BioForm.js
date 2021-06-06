@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import StepperControls from './StepperControls'
-import { SetUserInfoFunction } from '../routes/Register'
+import { UserInfoState } from '../routes/Register'
 
 //material ui
 import { makeStyles } from '@material-ui/core/styles';
@@ -27,10 +27,10 @@ const useStyles = makeStyles((theme)=>({
 //component main
 const BioForm = () => {
   //state
-  const submitBioForm = useContext(SetUserInfoFunction)
+  const {userInfo, setUserInfo} = useContext(UserInfoState)
   const [bioFormInfo, setBioFormInfo] = useState({
-    displayName: '',
-    bio: '',
+    displayName: userInfo.displayName,
+    bio: userInfo.bio,
     displayNameError: false
   })
   
@@ -51,6 +51,7 @@ const BioForm = () => {
     <Card 
       className={classes.root}
       elevation={3}
+      variant="outlined"
     >      
       <CardContent>
         <Typography 
@@ -64,6 +65,7 @@ const BioForm = () => {
           error={bioFormInfo.displayNameError}
           label="Display name"
           variant="outlined" 
+          defaultValue={bioFormInfo.displayName}
           onChange={
             (e)=>setBioFormInfo({
               ...bioFormInfo, 
@@ -82,7 +84,7 @@ const BioForm = () => {
             label="Add a bio"
             multiline
             rows={4}
-            defaultValue=""
+            defaultValue={bioFormInfo.bio}
             variant="outlined"
             fullWidth  
             onChange={
@@ -105,7 +107,7 @@ const BioForm = () => {
         <StepperControls 
           checkIfCanProceed={checkInput}
           onNext={()=>{
-            submitBioForm((userInfo)=>({
+            setUserInfo((userInfo)=>({
                 ...userInfo, 
                 bio: bioFormInfo.bio,
                 displayName: bioFormInfo.displayName

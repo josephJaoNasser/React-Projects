@@ -14,14 +14,22 @@
   "author": "Jay Nasser",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/data-grid": "^4.0.0-alpha.27",
     "@material-ui/icons": "^4.11.2",
+    "aws-sdk": "^2.922.0",
     "bcryptjs": "^2.4.3",
     "concurrently": "^6.0.0",
     "config": "^3.3.6",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "gridfs-stream": "^1.1.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.2"
+    "mongoose": "^5.12.2",
+    "multer": "^1.4.2",
+    "redux-persist": "^6.0.0",
+    "sharp": "^0.28.1",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

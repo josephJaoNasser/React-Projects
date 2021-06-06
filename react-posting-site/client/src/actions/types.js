@@ -14,7 +14,7 @@ export const DELETE_POST = 'DELETE_POST'
 export const POSTS_LOADING = 'POSTS_LOADING'
 
 // other errors / errpr management 
-
+export const POST_ERRORS = 'POST_ERRORS'
 
 /*********************
     USER MANAGEMENT

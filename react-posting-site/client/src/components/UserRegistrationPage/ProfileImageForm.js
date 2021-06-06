@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react'
-import { SetUserInfoFunction } from '../routes/Register'
+import { UserInfoState } from '../routes/Register'
 import StepperControls from './StepperControls'
+import { SingleImageUploader as ImageUploader } from '../ImageUploader'
 
 //material ui
 import { makeStyles } from '@material-ui/core/styles';
 import {  
   Card,
-  CardContent,
+  CardContent,  
   Typography
 } from '@material-ui/core';
 
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme)=>({
     margin: "1em auto",
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
-    },
+    }
   },
   instructions: {
     fontWeight: 'bold',
@@ -25,14 +26,26 @@ const useStyles = makeStyles((theme)=>({
 }));
 
 //component main
-const ProfileImageForm = () => {
-  const submitProfileImage = useContext(SetUserInfoFunction)  
+const ProfileImageForm = () => {  
+  const {userInfo, setUserInfo} = useContext(UserInfoState)
+  const [profileImage, setProfileImage] = useState({
+    image: userInfo.profile_image,
+    url: userInfo.profile_image_url
+  })
 
+  function onImageUpload(image){
+    setProfileImage({
+      url: image.url[0],
+      image: image.attatchments
+    })
+  }
+  
   const classes = useStyles()
   return (
     <Card 
       className={classes.root}
       elevation={3}
+      variant="outlined"
     >
       <CardContent>
         <Typography 
@@ -41,7 +54,25 @@ const ProfileImageForm = () => {
         >
           What do you look like?
         </Typography>    
-        <StepperControls />
+        <ImageUploader 
+          onUpload={(image)=>{onImageUpload(image)}}
+          defaultUrl={profileImage.url}
+        />
+        <br/><br/>
+        <StepperControls 
+          checkIfCanProceed={
+            ()=> profileImage.image ? true : false
+          }
+          onNext = {()=>
+            {
+              setUserInfo((userInfo) => ({
+                  ...userInfo,
+                  profile_image: profileImage.image,
+                  profile_image_url: profileImage.url
+                }))
+            }
+          }
+        />
       </CardContent>        
     </Card>       
   )

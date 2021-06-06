@@ -1,23 +1,55 @@
 import './App.css';
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { CircularProgress } from '@material-ui/core';
 
 //router
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 
-//components
-const Header = lazy(()=>import('./components/Header'))
-const Footer = lazy(()=>import('./components/Footer'))
+//redux
+import { connect } from 'react-redux'
+import { loadUser } from './actions/authActions'
 
 //routes
 const Home = lazy(()=>import('./components/routes/Home'))
 const Login = lazy(()=>import('./components/routes/Login'))
-const About = lazy(()=>import('./components/routes/About'))
 const Register = lazy(()=>import('./components/routes/Register'))
+const Profile = lazy(()=>import('./components/routes/Profile'))
 
+//component main
+function App(props) { 
 
-function App() {
-  let title = 'Post App' 
+  const {
+    isAuthenticated,
+    token,
+    user,
+    loadUser
+  } = props
+
+  useEffect(() => {    
+    if(token){
+      loadUser()
+    }   
+  }, [loadUser,token])
+
+  const checkGuest = (routeComponent) => {
+    if(!(isAuthenticated && token && user))
+    {
+      return(<Redirect to="/login"/>) 
+    }
+    else{
+      return(routeComponent)
+    }
+  }
+
+  const checkLoggedIn = (redirectTo, routeComponent) => {
+    if((isAuthenticated && token && user))
+    {
+      return(<Redirect to={redirectTo}/>) 
+    }
+    else{ 
+      return(routeComponent)
+    }
+  }
 
   return (    
     <div className="App">     
@@ -34,18 +66,33 @@ function App() {
             </div>            
           }
         >
-          <Header title={title}/>
-          <Route path="/" exact component={Home}/>
-          <Route path="/login" component={Login}/>
-          <Route path="/about" component={About}/>     
-          <Route path="/register" component={Register}/>       
-          <Footer />        
+          <Switch>
+            <Route path="/" exact >
+              { checkGuest(<Home/>) }
+            </Route> 
+
+            <Route path="/login" exact>
+              { checkLoggedIn('/',<Login/>) }  
+            </Route>     
+
+            <Route path="/register" exact>
+              { checkLoggedIn('/',<Register/>) }
+            </Route>
+
+            <Route path="/profile" component={Profile}/>
+          </Switch>
+          
         </Suspense>       
       </Router>          
     </div>    
   );
 }
 
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  token: state.auth.token,
+  user: state.auth.user
+})
 
 
-export default App;
+export default connect(mapStateToProps, { loadUser })(App);

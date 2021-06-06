@@ -17,7 +17,11 @@ const UserSchema = new Schema({
     required: true
   },
   profile_image:{
-    type: Array,
+    type: String,
+    default:''
+  },
+  profile_image_url: {
+    type: String,
     default:''
   },
   bio:{

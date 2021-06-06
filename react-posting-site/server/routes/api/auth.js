@@ -1,8 +1,8 @@
+require('dotenv/config')
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const { validateUser } = require('./validateUser')
-const config = require('config')
 const jwt = require('jsonwebtoken')
 const auth = require('../../middleware/auth')
 
@@ -19,14 +19,16 @@ const isEmail = (input) =>{
   return false
 }
 
-// @route POST api/auth
+// @route POST v1/auth/login
 // @desc authenticate the user
 // @access public
 router.post('/login', (req, res)=>{
-  
   User.findOne(
-    !isEmail(req.body.username) ?
-    { uname: req.body.username } : { email: req.body.username } 
+    req.body.username &&
+      !isEmail(req.body.username) ? 
+        { uname: req.body.username } :
+      req.body.email ? 
+        { email: req.body.email } : { email: req.body.username }
   )
   .then( user => {
     if(!user) return res.status(400).json({ msg: `User isn't registered` })
@@ -35,7 +37,8 @@ router.post('/login', (req, res)=>{
     bcrypt.compare(req.body.password, user.pwd).then(isMatch => {
       if(!isMatch){
         return res.status(400).json({
-          msg: "Password is incorrect"
+          msg: "Password is incorrect",
+          field: 'password'
         })
       }
 
@@ -50,7 +53,7 @@ router.post('/login', (req, res)=>{
       
       jwt.sign(
         { id: user._id },
-        config.get('jwtSecret'),
+        process.env.JWT_SECRET,
         (err, token) =>{
           if(err) throw err
           res.status(201).json({
@@ -65,7 +68,7 @@ router.post('/login', (req, res)=>{
   })  
 })
 
-// @route GET api/auth/user
+// @route GET v1/auth/user
 // @desc get user data
 // @access private
 router.get('/user',auth,(req,res)=>{

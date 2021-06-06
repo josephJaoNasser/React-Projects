@@ -1,82 +1,233 @@
+require('dotenv/config')
 const express = require('express')
+const multer = require('multer');
+const { uploadFiles, getUserProfileImage } = require('./s3')
+const crypto = require('crypto')
+const path = require('path')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const { validateUser } = require('./validateUser')
-const config = require('config')
 const jwt = require('jsonwebtoken')
+const imageCompressor = require('./image-compressor')
 
 //user model
 const User = require('../../models/User')
 
+const isEmail = (input) =>{
+  const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;   
+  if(emailRegex.test(input)){
+    return true
+  }
+  return false
+}
+
+//multer upload to memory
+const memoryStorage = new multer.memoryStorage()
+const uploadToMemory = multer({storage:memoryStorage}).single('profile-image')
+
+
 // @route GET api/users
-// @desc get all users
+// @desc get one user using either username or email
 // @access public
-// router.get('/', async(req, res)=> {
-//   User.find()
-//     .sort({ date: -1 })
-//     .then(users => res.json(users))
-// })
+router.get('/',(req, res)=> {
+  User.findOne(
+    req.query.username &&
+      !isEmail(req.query.username) ? 
+        { uname: req.query.username } :
+      req.query.email ? 
+        { email: req.query.email } : { email: req.query.username }  
+  ).select('-pwd')
+  .then( user => {
+    if(user){
+      return res.status(200).json({
+        user: user
+      })
+    }
+    else{
+      return res.json({
+        msg: 'User not found'
+      })
+    }
+  })
+})
+
+// @route GET api/users/profile_image
+// @desc get a user's profile image
+// @access public
+router.get('/:userId/profile-image/:filename', async(req, res)=> {
+
+  let readStream;
+  
+  if(req.params.userId.length != 24){
+    return res.status(404).json({
+        msg: 'User not found!'
+    })
+  }
+
+  const user = await User.findOne({_id: req.params.userId}).select('-pwd')  
+  if(!user){
+    return res.status(404).json({
+      msg: 'User not found!'
+    })
+  }
+  else if(user.profile_image !== req.params.filename){
+    return res.status(404).json({
+      msg: 'File not found!'
+    })              
+  }
+
+  switch(req.query.size){
+    case 'original':
+      readStream = await getUserProfileImage(`${req.params.filename}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+
+    case 'tiny':
+      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_tiny$1')}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+
+    case 'small':
+      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_small$1')}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+
+    case 'medium':
+      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_medium$1')}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+
+    case 'large':
+      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_large$1')}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+
+    default:
+      readStream = await getUserProfileImage(`${req.params.filename}`)
+      readStream.on('error', (err)=> {
+        return res.status(err.statusCode).json({
+          msg: err.code,
+          errorInfo: err
+        })
+      })
+      break;
+  }
+
+  readStream.pipe(res)
+})
+
+// @function uploadProfileImage()
+// @desc uploads a profile image for a user
+// @access public
+const uploadProfileImage = async (file) => {
+  const images = await imageCompressor.compressSingle(file)
+
+  if(!images){
+    return res.status(404).json({
+      msg: 'An error has occurred while uploading an image',
+      error: err
+    })
+  }
+  const res = await uploadFiles(images)
+  
+  return res
+}
 
 // @route POST api/users
 // @desc create a user
 // @access public
-router.post('/register', async(req, res)=> {
-
+router.post('/register', uploadToMemory, async(req, res)=> {   
+  
+  const parsedBody = JSON.parse(req.body.newUserData)  
   const { 
     username, 
     displayName, 
     password, 
     email, 
-    filename, 
     bio 
-  } = req.body
+  } = parsedBody
   
-  const validationStatus = await validateUser(req.body)
+  const validationStatus = await validateUser(parsedBody)
 
   if(!validationStatus?.success){
     return res.status(400).json(validationStatus)
   }
 
+  //create filename for profile image
+  req.file.filename = crypto.randomBytes(16).toString('hex') + path.extname(req.file.originalname)
+
+  //declare new user
   const newUser = new User({
     uname: username,
     dname: displayName,
     pwd: password,
     email: email,
-    profile_image: filename,
+    profile_image: req.file.filename,
+    profile_image_url: null,
     bio: bio, 
   })
+  
+  //hash the password
+  const passwordSalt = await bcrypt.genSalt(10).catch(err=> { if(err) throw err })
+  const hashedPassword = await bcrypt.hash(password, passwordSalt).catch(err=> { if(err) throw err })    
 
-  bcrypt.genSalt(10, (err, salt)=>{
-    bcrypt.hash(password,salt,(err,hash)=>{
-      if(err) throw err
-      newUser.pwd = hash
-      newUser.save().catch(err=>{
-        if(err) throw err
-        return res.status(400).json({
-          msg: "Something went wrong!",
-          error: err
-        })
-      }).then(user => {
+  //upload the profile image
+  const uploadResult = await uploadProfileImage(req.file)
+  const profileImageUrl = uploadResult.find(o => o.key === req.file.filename).Location
 
-        jwt.sign(
-          { id: user._id },
-          config.get('jwtSecret'),
-          (err, token) =>{
-            if(err) throw err
-            res.status(201).json({
-              token,
-              user:{
-                username: user.uname,
-                displayName: user.dname,
-                email: user.email
-              }
-            })
-          }
-        )
-      })    
+  //add the hashed password and image url
+  newUser.pwd = hashedPassword
+  newUser.profile_image_url = profileImageUrl
+
+  //save to db
+  const user = await  newUser.save().catch(err=>{
+    if(err) throw err
+    return res.status(400).json({
+      msg: "Something went wrong!",
+      error: err
     })
   })  
+
+  //sign the token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)   
+  
+  //return!
+  return res.status(201).json({
+    token,
+    user:{
+      username: user.uname,
+      displayName: user.dname,
+      email: user.email
+    }
+  })
+
 })
+  
 
 // @route DELETE api/users
 // @desc delete a user

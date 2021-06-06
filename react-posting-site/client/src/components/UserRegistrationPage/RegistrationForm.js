@@ -8,6 +8,7 @@ import LoginInfoForm from './LoginInfoForm';
 import BioForm from './BioForm';
 import ProfileImageForm from './ProfileImageForm';
 import ContactForm from './ContactForm';
+import RegistrationSummary from './RegistrationSummary';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,18 +29,44 @@ const RegistrationForm = () => {
       maxWidth="md"
     >
       <List>
-        <ListItem className={classes.root}>
-          <LoginInfoForm/>        
-        </ListItem>
-        <ListItem className={classes.root}>
-          <BioForm/>
-        </ListItem>
-        <ListItem className={classes.root}>
-          <ProfileImageForm/>
-        </ListItem>
-        <ListItem className={classes.root}>
-          <ContactForm/>
-        </ListItem>
+        {(() => {  
+          switch (activeStep) {
+            case 0:
+              return (
+                <ListItem className={classes.root}>
+                  <LoginInfoForm/>        
+                </ListItem>
+              )
+            case 1:
+              return (
+                <ListItem className={classes.root}>
+                  <BioForm/>
+                </ListItem>
+              )
+            case 2:
+              return (
+                <ListItem className={classes.root}>
+                  <ProfileImageForm/>
+                </ListItem>
+              )
+            case 3:
+                return (
+                  <ListItem className={classes.root}>
+                    <ContactForm/>
+                  </ListItem>
+                )
+            case 4:
+                return (
+                  <ListItem className={classes.root}>
+                    <RegistrationSummary />
+                  </ListItem>
+                )
+            default:
+              return (
+                <div>Whoops... something's not right</div>
+              )
+          }
+        })()}
       </List>    
     </Container>
   )
