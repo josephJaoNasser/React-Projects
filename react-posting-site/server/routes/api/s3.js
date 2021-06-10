@@ -2,7 +2,6 @@ require('dotenv/config')
 const streamifier = require('streamifier');
 const S3 = require('aws-sdk/clients/s3')
 
-const profileImageBucket = process.env.AWS_PROFILE_IMAGE_BUCKET
 const bucketRegion = process.env.AWS_BUCKET_REGION
 const awsId = process.env.AWS_ID
 const awsSecret = process.env.AWS_SECRET
@@ -14,13 +13,13 @@ const s3 = new S3({
 })
 
 // upload
-const uploadFiles = async (files) => {
+const uploadFiles = async (files, bucket) => {
   const params =[]
 
   files.forEach(file => {
     const fileStream = streamifier.createReadStream(file.buffer)
     const uploadParams = {
-      Bucket: profileImageBucket,
+      Bucket: bucket,
       Body: fileStream,
       Key: file.filename
     }
@@ -37,16 +36,45 @@ const uploadFiles = async (files) => {
   return res
 }
 
-// get profile image
-const getUserProfileImage = async (fileKey) => {
+// get images
+const getFile = async (fileKey, bucket) => {
   const downloadParams = {
     Key: fileKey,
-    Bucket: profileImageBucket
+    Bucket: bucket
   }
 
   const res = await s3.getObject(downloadParams).createReadStream()
   return res
 }
 
+
+//delete multiple files
+const deleteFiles = async(fileKeys, bucket) => {
+  if(!Array.isArray(fileKeys)){
+    fileKeys = [fileKeys]
+  }
+
+  const objects = fileKeys.map(key => (
+    [{ Key: key },
+    { Key: key.replace(/(\.[\w\d_-]+)$/i, '_tiny$1')},
+    { Key: key.replace(/(\.[\w\d_-]+)$/i, '_small$1')},
+    { Key: key.replace(/(\.[\w\d_-]+)$/i, '_medium$1')},
+    { Key: key.replace(/(\.[\w\d_-]+)$/i, '_large$1')}]
+  ))
+
+  const deleteParams ={ 
+    Bucket: bucket,
+    Delete: {
+      Objects: objects.flat(),
+      Quiet: false
+    }
+  }
+  const res = await s3.deleteObjects(deleteParams)
+              .promise().catch(err=> {if(err) throw err})
+
+  return res
+}
+
 exports.uploadFiles = uploadFiles
-exports.getUserProfileImage = getUserProfileImage
+exports.getFile = getFile
+exports.deleteFiles = deleteFiles

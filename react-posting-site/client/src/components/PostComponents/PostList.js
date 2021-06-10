@@ -43,10 +43,10 @@ const PostList = (props) => {
           mountOnEnter
           unmountOnExit
         >
-          <CircularProgress />
+          <CircularProgress style={{marginTop:'1em'}}/>
         </Slide> )
       }
-      <List style={{marginTop:"1em"}}>
+      <List>
         { 
           posts?.length ?
             posts.map((post) => (                         

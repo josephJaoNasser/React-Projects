@@ -1,6 +1,9 @@
 import './App.css';
 import { lazy, Suspense, useEffect } from 'react'
+
+//material ui
 import { CircularProgress } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 //router
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
@@ -14,6 +17,20 @@ const Home = lazy(()=>import('./components/routes/Home'))
 const Login = lazy(()=>import('./components/routes/Login'))
 const Register = lazy(()=>import('./components/routes/Register'))
 const Profile = lazy(()=>import('./components/routes/Profile'))
+const Navigation = lazy(()=> import('./components/Navigation')) 
+
+const useStyles = makeStyles(theme=> ({
+  mainContainer:{
+    [theme.breakpoints.up('sm')]: {
+      display: 'flex',
+      //flexFlow: 'row-reverse'
+    },
+    [theme.breakpoints.down('xs')]: {
+      display: 'block',
+    }
+  }
+}))
+
 
 //component main
 function App(props) { 
@@ -24,6 +41,8 @@ function App(props) {
     user,
     loadUser
   } = props
+
+  const classes = useStyles()
 
   useEffect(() => {    
     if(token){
@@ -66,21 +85,30 @@ function App(props) {
             </div>            
           }
         >
-          <Switch>
-            <Route path="/" exact >
-              { checkGuest(<Home/>) }
-            </Route> 
+          <div className={classes.mainContainer}>        
+            {
+              (user && token) &&
+              <Navigation 
+                user={user}
+              />
+            }   
+            <Switch>
+              <Route path="/" exact >
+                { checkGuest(<Home/>) }
+              </Route> 
 
-            <Route path="/login" exact>
-              { checkLoggedIn('/',<Login/>) }  
-            </Route>     
+              <Route path="/login" exact>
+                { checkLoggedIn('/',<Login/>) }  
+              </Route>     
 
-            <Route path="/register" exact>
-              { checkLoggedIn('/',<Register/>) }
-            </Route>
+              <Route path="/register" exact>
+                { checkLoggedIn('/',<Register/>) }
+              </Route>
 
-            <Route path="/profile" component={Profile}/>
-          </Switch>
+              <Route path="/profile" component={Profile}/>
+            </Switch>
+           
+          </div>
           
         </Suspense>       
       </Router>          

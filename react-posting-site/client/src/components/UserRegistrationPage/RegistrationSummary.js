@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     <Container maxWidth='sm'>     
       <h1>Summary</h1>
       <div className={classes.root}>
-        <Avatar src={userInfo.profile_image_url} className={classes.large} />
+        <Avatar src={userInfo.profile_image.url} className={classes.large} />
       </div>
       
       <List>

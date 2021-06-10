@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+
+//components
+import { ImageAttatchmentsPreview } from '../AttatchmentsPreview'
+import PostActionsComponent from './PostActionsComponent'
+
+//context
+import { useUpdateImageAttatchments } from '../AttatchmentsContext'
 
 //redux
 import { connect } from 'react-redux'
 import { createPost } from '../../actions/postActions'
 
 //material ui
-import {
-  Button,
+import {  
   TextField,
-  Snackbar
+  Snackbar,
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 
@@ -22,7 +28,7 @@ const Alert = (props) => {
 component
 =============*/
 const AddPost = (props) => {
-
+  const setImageAttatchments = useUpdateImageAttatchments()
   const [text, setText] = useState('')
   const [message, setMessage] = useState({
     msg: '',
@@ -32,7 +38,8 @@ const AddPost = (props) => {
   const {  
     error,
     createPost,
-    author
+    author,
+    isSendingPost
   } = props
   
   useEffect(() => {
@@ -49,20 +56,23 @@ const AddPost = (props) => {
     setMessage({...message, success:true})
   }
 
-  const sendPost = (e) => {
-    e.preventDefault();    
+  const sendPost = async (attatchments) => {    
     if(!text){
-      setMessage({msg: 'Please say something!', success:false})
-      return
-    }
-
-    const newPost = {
-      _id: Math.random(),
-      text: text,
-      user: author
+      if(!(attatchments?.images?.length)){
+        setMessage({msg: 'Please say something!', success:false})
+        return
+      }
     }
     
-    createPost(newPost)
+    const newPost = {
+      text: text,
+      user: author,
+      media: attatchments.images
+    }
+
+    await createPost(newPost)
+    
+    setImageAttatchments({images: []})
     setText('');
   }
 
@@ -70,24 +80,20 @@ const AddPost = (props) => {
   return (
     <form className="addForm">
       <div className="form-control">
-      <TextField
-        placeholder="Say something..."
-        multiline
-        rows={5}
-        style={{width:"100%", marginBottom:"1.5em"}}
-        value={text}
-        onChange={e => setText(e.target.value)}
-        variant="outlined"
-      />
-        
+        <TextField
+          placeholder="Say something..."
+          multiline
+          rows={5}
+          style={{width:"100%", marginBottom:"10px"}}
+          value={text}
+          onChange={e => setText(e.target.value)}
+          variant="outlined"
+          disabled={isSendingPost}
+          />
       </div> 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={sendPost}
-      >
-        Post
-      </Button>
+      <ImageAttatchmentsPreview/>
+      <PostActionsComponent onPostSubmit={ (attatchments) => sendPost(attatchments) }/>
+
       <Snackbar
         anchorOrigin={{ vertical:'top', horizontal:'center' }} 
         open={!message.success} 
@@ -108,6 +114,7 @@ AddPost.propTpyes = {
 
 const mapStateToProps = (state) => ({
   error: state.posts.error,
+  isSendingPost: state.posts.isSendingPost,
   author: state.auth.user
 })
 

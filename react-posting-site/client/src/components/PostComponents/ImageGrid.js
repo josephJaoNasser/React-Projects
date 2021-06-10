@@ -5,11 +5,17 @@ import {
   GridListTile
 }from '@material-ui/core'
 
-const url = "https://simple-posts-app.herokuapp.com/api/posts/"
-
 const ImageGrid = ({ postid, images }) => {
+  const url = 'v1/posts/'
   return (
-    <GridList cellHeight={160} cols={2} rows={2}>
+    // <div style={styles}>
+    //   {images.map((image,index) => (
+    //     <div key={image} >
+    //       <img src={`${url}${postid}/media/${image}?size=small`} alt={image.title} />
+    //     </div>
+    //   ))}
+    // </div>
+    <GridList cols={2} rows={2}>
       {images.map((image,index) => (
         <GridListTile key={image} >
           <img src={`${url}${postid}/media/${image}?size=small`} alt={image.title} />
@@ -24,5 +30,11 @@ ImageGrid.propTypes = {
   images: PropTypes.array
 }
 
+// const styles = {
+//   display: 'grid',
+//   gridTemplateRows: '1fr 1fr',
+//   gridTemplateColumns: '1fr 1fr',
+//   maxWidth: '100px'
+// }
 
 export default ImageGrid

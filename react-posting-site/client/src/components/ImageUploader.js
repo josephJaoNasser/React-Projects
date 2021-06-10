@@ -1,13 +1,24 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { PhotoCamera } from '@material-ui/icons';
+//context providers
+import { useImageAttatchments, useUpdateImageAttatchments } from './AttatchmentsContext'
+
+//materual ui
+import { Photo, PhotoCamera } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { 
   Button,
-  Avatar
+  IconButton,
+  Avatar,
+  Snackbar,
+  Tooltip
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 
+const Alert = (props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,73 +37,95 @@ const useStyles = makeStyles((theme) => ({
   
 }));
 
-//Validate and set images
-function setImage(files){         
-  let attatchments = []
-  let url = []   
-  let errorMsg = ''   
+function isValidImage(file){
   const _validFileExtensions = ["gif","jpg", "webp", "jpeg", "png"];    
   
-  //if only one file is uploaded
-  if(files.length === 1){
-    var ext =  files[0].name.split('.').pop();
-    if(_validFileExtensions.includes(ext.toLowerCase())){
-      url.push(URL.createObjectURL(files[0]));  
-      attatchments = attatchments.concat(Array.from(files))
-      return {
-        url,
-        attatchments
-      };
-    }
-    else{
-      errorMsg = 'Invalid file type'
-    }
+  var ext =  file.name.split('.').pop();
+  if(_validFileExtensions.includes(ext.toLowerCase())){
+    return true
   }
-  
-  //if multiple files are uploaded
-  if((files.length + url.length) <= 4 && (files.length + url.length) > 1){    
-    files.forEach((item) => {
-      var ext =  item.name.split('.').pop();         
-      if(_validFileExtensions.includes(ext.toLowerCase())){
-        url.push(URL.createObjectURL(item));    
-      }
-      else{
-        url = []
-        errorMsg = 'The file you uploaded is not supported...'
-      }     
-    });
+  else{
+    return false
+  }
+} 
 
-    if(!errorMsg){
-      errorMsg = ''
-      attatchments = attatchments.concat(Array.from(files))
+//Set and return images
+function setImage(files){       
+  let errorMsg = ''   
+  
+  //when uploading only 1 image
+  if(files.length === 1){
+    if(!isValidImage(files[0])){
+      errorMsg = 'Not a valid image'
       return {
-        url,
-        attatchments
-      };
+        error: errorMsg
+      }
     }
-    
-  }
-  else if((files.length + url.length) > 4){
-    errorMsg = 'Only up to 4 images are allowed'    
-  }                      
+
+    files[0].url = URL.createObjectURL(files[0]);  
+    return {
+      image: files[0]
+    };
+  }  
+  else{
+    //if multiple files are uploaded
+    for (let i = 0; i < files.length; i++) {
+      const image = files[i];
+      if(!isValidImage(image)){
+        errorMsg = 'Please upload valid images'
+        return {
+          error: errorMsg
+        }
+      }
+      files[i].url = URL.createObjectURL(image)     
+    }
+
+    return{
+      images: [...files]
+    }
+  }  
 }
 
-
 // Single Image uploader component  
-export const SingleImageUploader = ({ onUpload, defaultUrl }) => {
-  const [attatchedImage, setAttatchedImage] = useState()
+export const SingleImageUploader = ({ onUpload,disabled, defaultUrl }) => {
+  const [attatchedImage, setAttatchedImage] = useState({
+    image: null
+  })
+
+  const [errors, setErrors] = useState({
+    hasErrors: false,
+    error: ''
+  })
   const classes = useStyles()
+
+  const resetErrors = () => {
+    setErrors({
+      hasErrors: false,
+      error: ''
+    }) 
+  }
+
   const handleFileInput = (e) => {
-    const imageData = setImage(e.target.files)
-    setAttatchedImage(...imageData.url)
+    const imageData = setImage(e.target.files)  
+    
+    if(imageData.error){
+      setErrors({
+        hasErrors: true,
+        error: imageData.error
+      }) 
+    }
+    else{      
+      resetErrors()
+      setAttatchedImage({image: imageData.image})
+    }
     
     if(onUpload)
-      onUpload(imageData)
+      onUpload(imageData.image)
   }
 
   return (
     <>
-      <Avatar src={attatchedImage ?  attatchedImage : defaultUrl} className={classes.large} />
+      <Avatar src={attatchedImage.image ?  attatchedImage.image.url : defaultUrl} className={classes.large} />
       <input 
         accept="image" 
         className={classes.input} 
@@ -101,44 +134,123 @@ export const SingleImageUploader = ({ onUpload, defaultUrl }) => {
         onChange = {handleFileInput}
       />
       <label htmlFor="icon-button-file">
-        <Button 
-          color="primary" 
-          variant="outlined" 
-          aria-label="upload picture" 
-          component="span"
-        >
-          <PhotoCamera /> &nbsp;&nbsp; Upload
-        </Button>
+        <Tooltip title='Add an image'>
+          <Button 
+            color="primary" 
+            variant="outlined" 
+            aria-label="upload picture" 
+            component="span"
+            disabled={disabled}
+          >
+            <PhotoCamera /> &nbsp;&nbsp; Upload
+          </Button>
+        </Tooltip>
       </label>
+      <Snackbar
+        anchorOrigin={{ vertical:'top', horizontal:'center' }} 
+        open={errors.hasErrors} 
+        onClose={resetErrors}
+        autoHideDuration={6000}
+      >
+        <Alert onClose={resetErrors} severity="error">
+          {errors.error}
+        </Alert>
+      </Snackbar>
     </>
   )
 }
 
 
 // Multi Image uploader component
-//=========================================
-// THIS IS NOT READY YET !!!!!!!!!
-
-export const MultiImageUploader = ({ onUpload }) => {
+export const MultiImageUploader = ({ onUpload, disabled }) => {  
+  const attatchedImages = useImageAttatchments()
+  const setAttatchedImages = useUpdateImageAttatchments()
   const classes = useStyles()
+
+  const [errors, setErrors] = useState({
+    hasErrors: false,
+    error: ''
+  })
+
+  const resetErrors = () => {
+    setErrors({
+      hasErrors: false,
+      error: ''
+    }) 
+  }
+
+  const handleFileInput = (e) => {
+    if(e.target.files.length + attatchedImages.images.length > 4){
+      setErrors({
+        hasErrors: true,
+        error: 'Can only upload 4 images'
+      }) 
+      return
+    }
+
+    const imageData = setImage(e.target.files)
+    if(imageData.error){
+      setErrors({
+        hasErrors: true,
+        error: imageData.error
+      }) 
+      return
+    }
+
+    // NOTE imageData.image is used when only 1 photo is uploaded
+    // imageData.imageS is used when multiple photos are uploaded
+    
+    setAttatchedImages({
+      images: !imageData.image ?
+        [...attatchedImages.images, ...imageData.images] 
+        /*else*/: [...attatchedImages.images, imageData.image],
+    })
+    resetErrors()     
+
+    if(onUpload)
+      onUpload(!imageData.image ? imageData.images : imageData.image)
+      
+  }
+
   return (
     <>      
       <input
         accept="image/*"
         className={classes.input}
         id="contained-button-file"
-        multiple
-        type="file"   
+        multiple={ attatchedImages.images.length < 3 ? true : false}
+        type="file"  
+        onChange = { handleFileInput } 
+        disabled= {disabled}
       />
       <label htmlFor="contained-button-file">
-        <Button color="primary" aria-label="upload picture" component="span">
-          <PhotoCamera /> Upload
-        </Button>
+        <Tooltip title='Add an image'>
+          <IconButton 
+            color="primary" 
+            aria-label="upload picture" 
+            component="span"
+            disabled={disabled}
+          >
+            <Photo /> 
+          </IconButton>
+        </Tooltip>
       </label>
+
+      <Snackbar
+        anchorOrigin={{ vertical:'top', horizontal:'center' }} 
+        open={errors.hasErrors} 
+        onClose={resetErrors}
+        autoHideDuration={6000}
+      >
+        <Alert onClose={resetErrors} severity="error">
+          {errors.error}
+        </Alert>
+      </Snackbar>
     </>
   )
 }
 
 SingleImageUploader.propTypes = MultiImageUploader.propTypes = {
-  onUpload: PropTypes.func 
+  onUpload: PropTypes.func, 
+  disabled: PropTypes.bool
 }

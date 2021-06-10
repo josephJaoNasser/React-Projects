@@ -37,7 +37,6 @@ const Register = ({ registerUser, isLoading, error, token }) => {
     confirm_password: '', 
     email: '', 
     profile_image: null,
-    profile_image_url: null, 
     bio: '' 
   });
 

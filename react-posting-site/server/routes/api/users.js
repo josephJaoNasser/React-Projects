@@ -1,7 +1,7 @@
 require('dotenv/config')
 const express = require('express')
 const multer = require('multer');
-const { uploadFiles, getUserProfileImage } = require('./s3')
+const { uploadFiles, getFile } = require('./s3')
 const crypto = require('crypto')
 const path = require('path')
 const router = express.Router()
@@ -13,6 +13,10 @@ const imageCompressor = require('./image-compressor')
 //user model
 const User = require('../../models/User')
 
+//profile image bucket
+const profileImageBucket = process.env.AWS_PROFILE_IMAGE_BUCKET
+
+//check if the user input is an e-mail or a username
 const isEmail = (input) =>{
   const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;   
   if(emailRegex.test(input)){
@@ -54,23 +58,25 @@ router.get('/',(req, res)=> {
 // @route GET api/users/profile_image
 // @desc get a user's profile image
 // @access public
-router.get('/:userId/profile-image/:filename', async(req, res)=> {
+router.get('/:userId/profile-image/:mediaKey', async(req, res)=> {
 
   let readStream;
+  const mediaKey = req.params.mediaKey
+  const userId = req.params.userId
   
-  if(req.params.userId.length != 24){
+  if(userId.length != 24){
     return res.status(404).json({
         msg: 'User not found!'
     })
   }
 
-  const user = await User.findOne({_id: req.params.userId}).select('-pwd')  
+  const user = await User.findOne({_id: userId}).select('-pwd')  
   if(!user){
     return res.status(404).json({
       msg: 'User not found!'
     })
   }
-  else if(user.profile_image !== req.params.filename){
+  else if(user.profile_image !== mediaKey){
     return res.status(404).json({
       msg: 'File not found!'
     })              
@@ -78,7 +84,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
 
   switch(req.query.size){
     case 'original':
-      readStream = await getUserProfileImage(`${req.params.filename}`)
+      readStream = await getFile(`${mediaKey}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -88,7 +94,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
       break;
 
     case 'tiny':
-      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_tiny$1')}`)
+      readStream = await getFile(`${mediaKey.replace(/(\.[\w\d_-]+)$/i, '_tiny$1')}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -98,7 +104,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
       break;
 
     case 'small':
-      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_small$1')}`)
+      readStream = await getFile(`${mediaKey.replace(/(\.[\w\d_-]+)$/i, '_small$1')}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -108,7 +114,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
       break;
 
     case 'medium':
-      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_medium$1')}`)
+      readStream = await getFile(`${mediaKey.replace(/(\.[\w\d_-]+)$/i, '_medium$1')}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -118,7 +124,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
       break;
 
     case 'large':
-      readStream = await getUserProfileImage(`${req.params.filename.replace(/(\.[\w\d_-]+)$/i, '_large$1')}`)
+      readStream = await getFile(`${mediaKey.replace(/(\.[\w\d_-]+)$/i, '_large$1')}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -128,7 +134,7 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
       break;
 
     default:
-      readStream = await getUserProfileImage(`${req.params.filename}`)
+      readStream = await getFile(`${mediaKey}`, profileImageBucket)
       readStream.on('error', (err)=> {
         return res.status(err.statusCode).json({
           msg: err.code,
@@ -147,13 +153,14 @@ router.get('/:userId/profile-image/:filename', async(req, res)=> {
 const uploadProfileImage = async (file) => {
   const images = await imageCompressor.compressSingle(file)
 
-  if(!images){
+  if(images.error){
     return res.status(404).json({
       msg: 'An error has occurred while uploading an image',
-      error: err
+      error: images.error
     })
   }
-  const res = await uploadFiles(images)
+  
+  const res = await uploadFiles(images, profileImageBucket)
   
   return res
 }
@@ -161,7 +168,7 @@ const uploadProfileImage = async (file) => {
 // @route POST api/users
 // @desc create a user
 // @access public
-router.post('/register', uploadToMemory, async(req, res)=> {   
+router.post('/register', uploadToMemory, async(req, res)=> { 
   
   const parsedBody = JSON.parse(req.body.newUserData)  
   const { 

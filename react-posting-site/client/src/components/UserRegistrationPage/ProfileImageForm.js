@@ -28,16 +28,10 @@ const useStyles = makeStyles((theme)=>({
 //component main
 const ProfileImageForm = () => {  
   const {userInfo, setUserInfo} = useContext(UserInfoState)
-  const [profileImage, setProfileImage] = useState({
-    image: userInfo.profile_image,
-    url: userInfo.profile_image_url
-  })
+  const [profileImage, setProfileImage] = useState(userInfo?.profileImage?.url ?? {url: ''})
 
   function onImageUpload(image){
-    setProfileImage({
-      url: image.url[0],
-      image: image.attatchments
-    })
+    setProfileImage(image)
   }
   
   const classes = useStyles()
@@ -55,20 +49,19 @@ const ProfileImageForm = () => {
           What do you look like?
         </Typography>    
         <ImageUploader 
-          onUpload={(image)=>{onImageUpload(image)}}
+          onUpload={ onImageUpload }
           defaultUrl={profileImage.url}
         />
         <br/><br/>
         <StepperControls 
           checkIfCanProceed={
-            ()=> profileImage.image ? true : false
+            ()=> profileImage ? true : false
           }
           onNext = {()=>
             {
               setUserInfo((userInfo) => ({
                   ...userInfo,
-                  profile_image: profileImage.image,
-                  profile_image_url: profileImage.url
+                  profile_image: profileImage
                 }))
             }
           }

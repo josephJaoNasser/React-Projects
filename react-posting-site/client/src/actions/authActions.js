@@ -20,7 +20,6 @@ const authUrl = "/v1/auth/"
 
 //authenticate
 export const loadUser = () => (dispatch, getState) => {
-  console.log('a')
   dispatch({
     type: USERS_LOADING
   })
@@ -112,7 +111,7 @@ export const registerUser = (newUser) => dispatch => {
   })  
 
   let formData = new FormData()
-  formData.append('profile-image', newUser.profile_image[0])
+  formData.append('profile-image', newUser.profile_image)
   formData.append('newUserData', JSON.stringify(newUser))
 
   axios.post(`${url}register`,formData,{

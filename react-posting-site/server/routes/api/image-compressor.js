@@ -8,11 +8,12 @@ const compressSingle = async (file, res, next) => {
   if (!file){
     if(res)
         return res.status(400).json({
-            msg: 'Please upload a profile image',
-            field: 'profileImage'
+            msg: 'Please upload an image',
         })
     
-    return
+    return {
+        error: errors
+    }
   };    
      
   let newFile = {...file};     
@@ -82,10 +83,16 @@ const compressSingle = async (file, res, next) => {
           errors = err
       })   
 
+  if(errors){
+    return {
+        error: errors
+    }
+  }
+  
   compressedFiles = compressedFiles.concat(file)
-
+      
   if(next){
-    next(errors, req.files)
+    next(errors, compressedFiles)
   }    
   else{
     return compressedFiles
@@ -102,15 +109,16 @@ const compressMultiple = async (files, res, next) => {
   if (!files){
     if(res)
         return res.status(400).json({
-            msg: 'Please upload a profile image',
-            field: 'profileImage'
+            msg: 'Please upload an image'
         })
     
-    return
+    return {
+        error: 'Please upload an image'
+    }
   };      
      
   await Promise.all(    
-      req.files.map(async file => {    
+      files.map(async file => {    
           let newFile = {...file};     
           const filenameLarge = file.filename.replace(/(\.[\w\d_-]+)$/i, '_large$1')
           
@@ -131,7 +139,7 @@ const compressMultiple = async (files, res, next) => {
   );
 
   await Promise.all(    
-      req.files.map(async file => {    
+      files.map(async file => {    
           let newFile = {...file};     
           const filenameMedium = file.filename.replace(/(\.[\w\d_-]+)$/i, '_medium$1')
           
@@ -152,7 +160,7 @@ const compressMultiple = async (files, res, next) => {
   );    
 
   await Promise.all(    
-      req.files.map(async file => {    
+      files.map(async file => {    
           let newFile = {...file};
           const filenameSmall = file.filename.replace(/(\.[\w\d_-]+)$/i, '_small$1') 
           
@@ -172,13 +180,19 @@ const compressMultiple = async (files, res, next) => {
       })
   );
 
-  req.files = req.files.concat(compressedFiles)
+  if(errors){
+    return {
+        error: errors
+    }
+  }
+
+  files = files.concat(compressedFiles)
 
   if(next){
-    next(errors, req.files)
+    next(errors, files)
   }    
   else{
-    return req.files
+    return files
   }
 };
 
