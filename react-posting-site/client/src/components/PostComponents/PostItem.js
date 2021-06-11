@@ -1,27 +1,71 @@
-import React from 'react'
+import React, { lazy, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 
-//components
-import ImageGrid from './ImageGrid'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
 
 //material ui
 import {  
-  ListItem, 
-  ListItemAvatar, 
-  Avatar, 
+  Avatar,
+  IconButton,
+  Link as MaterialUiLink,
+  ListItem,
+  ListItemAvatar,
+  ListItemIcon,
   ListItemText,
-  Link as MaterialUiLink
+  Menu,
+  MenuItem,
+  Typography,
 } from '@material-ui/core';
+import { 
+  MoreVert, 
+  ErrorOutline, 
+  DeleteOutline, 
+  Edit as EditIcon
+} from '@material-ui/icons';
+
 
 //redux store
 import store from '../../store/Store'
 
-const PostItem = ({post, onDelete}) => {
+//components
+const ImageGrid = lazy(()=> import('./ImageGrid'))
+const DeletePost = lazy(()=> import('./DeletePost'))
+const EditPost = lazy(()=> import('./EditPost'))
 
+//main
+const PostItem = ({post, onDelete, onEdit}) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  
   const profilImageUrl = post.user.profile_image ? `/v1/users/${post.user._id}/profile-image/${post.user.profile_image}?size=tiny` : ''
+  
+  const handleActionsOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleActionsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const confirmDeleteToggle = () => {
+    handleActionsClose()
+    setConfirmDeleteOpen(!confirmDeleteOpen)
+  };
+
+  const editFormToggle = () => {
+    handleActionsClose()
+    setEditOpen(!editOpen);
+  };
+
+  const onEditConfirm = (changes) => {
+    setEditOpen(false)
+    if(changes === post.text)
+      return
+    
+    onEdit(post._id, changes)
+  }
 
   return (    
     <ListItem alignItems="flex-start" divider>
@@ -56,12 +100,62 @@ const PostItem = ({post, onDelete}) => {
             secondaryTypographyProps={{variant:"caption"}}      
           />
 
-          {
-            post.user._id === store.getState().auth.user._id &&        
-            <ConfirmDeleteModal 
-              onConfirm={()=> onDelete(post._id)}
-            />
-          }
+          <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleActionsOpen}>
+            <MoreVert/>
+          </IconButton>
+
+          <EditPost 
+            open={editOpen} 
+            onConfirm={(changes)=> {
+              onEditConfirm(changes)
+            }} 
+            post={post}
+            onCancel={editFormToggle}
+          />
+          <DeletePost 
+            open={confirmDeleteOpen} 
+            onConfirm={()=> {
+              onDelete(post._id)
+              setConfirmDeleteOpen(false)
+            }} 
+            onCancel={confirmDeleteToggle}
+          />
+
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleActionsClose}            
+          >
+            {
+              post.user._id === store.getState().auth.user._id ?
+              <div>
+                <MenuItem onClick={editFormToggle}>
+                  <ListItemIcon>
+                    <EditIcon/>
+                  </ListItemIcon>
+                  <ListItemText>
+                    Edit
+                  </ListItemText>                  
+                </MenuItem>
+                <MenuItem onClick={confirmDeleteToggle}>
+                  <ListItemIcon>
+                    <DeleteOutline color='secondary'/>                    
+                  </ListItemIcon>
+                  <ListItemText>
+                    <Typography color='secondary'>
+                      Delete
+                    </Typography>
+                  </ListItemText>                  
+                </MenuItem>
+              </div>   
+              : 
+              <MenuItem>
+                <ErrorOutline/>&nbsp;&nbsp;Report
+              </MenuItem>
+            }
+          </Menu>  
 
         </div>
         <div className='contents-body'>
@@ -79,12 +173,9 @@ const PostItem = ({post, onDelete}) => {
 }
 
 //Define props
-PostItem.defaultProps = {
-
-}
-
 PostItem.propTypes = {
-  post: PropTypes.object
+  post: PropTypes.object,
+  onDelete: PropTypes.func
 }
 
 export default PostItem

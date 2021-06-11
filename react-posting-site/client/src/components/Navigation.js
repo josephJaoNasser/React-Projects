@@ -14,16 +14,12 @@ import {
   Avatar,
   AppBar,
   Button,
-  //CircularProgress,
-  //CssBaseline,
   Divider,
   Drawer,
   Hidden,
-  //Icon,
   IconButton,
   List,
   ListItem,
-  //ListItemIcon,
   ListItemText,
   Toolbar,
   Typography,
@@ -44,7 +40,7 @@ const Navigation = (props) => {
     window,
     logout
   }=props
-
+  
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);

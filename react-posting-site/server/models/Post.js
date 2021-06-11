@@ -16,7 +16,8 @@ const PostSchema = new Schema({
     required: true
   },
   updatedAt:{
-    type: Date
+    type: Date,
+    default: Date.now
   },
   user:{
     type: Object,

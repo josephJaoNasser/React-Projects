@@ -5,7 +5,10 @@ import {
   NEW_POST_SENT, 
   POST_ERRORS,
   DELETE_POST, 
-  POSTS_LOADING
+  UPDATE_POST,
+  POSTS_LOADING,
+  SET_SUCCESS_MESSAGE,
+  CLEAR_SUCCESS_MESSAGE
 } from './types'
 import axios from 'axios'
 import { tokenConfig } from '../actions/authActions'
@@ -53,7 +56,14 @@ export const createPost = (postData) => (dispatch, getState) => {
       dispatch({
         type: NEW_POST_SENT,
         post: res.data.post
-      })    
+      })   
+      
+      dispatch({
+        type: SET_SUCCESS_MESSAGE,
+        successMessage: 'Posted!'
+      })
+
+      setTimeout(() => dispatch({type: CLEAR_SUCCESS_MESSAGE}), 3000);
     }
   ).catch(err => {
     if(err){
@@ -65,6 +75,25 @@ export const createPost = (postData) => (dispatch, getState) => {
   })
 }
 
+export const editPost = (postId, changes) => (dispatch, getState) => {  
+  dispatch({type: POSTS_LOADING})
+
+  axios.put(`${url}${postId}`,{changes},tokenConfig(getState)).then(res => {
+    dispatch({
+      type: UPDATE_POST,
+      id: postId,
+      post: res.data.post
+    })
+
+    dispatch({
+      type: SET_SUCCESS_MESSAGE,
+      successMessage: 'Post updated successfully'
+    })
+
+    setTimeout(() => dispatch({type: CLEAR_SUCCESS_MESSAGE}), 3000);
+  })
+}
+
 export const deletePost = (postId) => (dispatch, getState) => {
   axios.delete(`${url}${postId}`,tokenConfig(getState)).then(res => {
     dispatch({
@@ -72,6 +101,13 @@ export const deletePost = (postId) => (dispatch, getState) => {
       id: postId,
       error:null
     })
+
+    dispatch({
+      type: SET_SUCCESS_MESSAGE,
+      successMessage: 'Post deleted'
+    })
+
+    setTimeout(() => dispatch({type: CLEAR_SUCCESS_MESSAGE}), 3000);
   }
   ).catch(err=>{
     if(err){

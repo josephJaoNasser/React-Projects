@@ -128,7 +128,7 @@ const uploadPostMedia = async (files) => {
   }
 
   const res = await uploadFiles(images, postMediaBucket)
-  
+
   return res
 }
 
@@ -164,7 +164,7 @@ router.post('/', auth, uploadToMemory, async(req, res)=> {
       newPost.save().then(post => res.status(201).json({post}))
     }).catch(err => {
       return res.status(400).json({
-        msg: 'Something went wrong',
+        msg: 'Something went wrong while creating the post',
         error: err
       })
     })
@@ -173,6 +173,39 @@ router.post('/', auth, uploadToMemory, async(req, res)=> {
   return res.status(200)
 
 })
+
+// @route PUT api/posts
+// @desc edit a post
+// @access private
+router.put('/:id', auth, async(req, res)=> {
+  Post.findById(req.params.id)
+    .then(post => {
+      if(req.user.id != post.user._id){
+        return res.status(401).json({
+          msg: "You are not allowed to edit this post because you are not the author."
+        })
+      }
+ 
+      post.text = req.body.changes
+      post.updatedAt = Date.now()
+
+      post.save().then(updatedPost => {
+        return res.status(200).json({post: updatedPost})
+      }) 
+      
+      
+
+    }).catch(err => {
+      return res.status(404).json({
+        success: false,
+        msg: "An error has occured while editing the post",
+        error: err
+      })
+    })
+
+  return res.status(200)
+})
+
 
 // @route DELETE api/posts
 // @desc delete a post
@@ -192,16 +225,16 @@ router.delete('/:id',auth,async(req, res)=> {
       }
 
       post.remove().then(()=> {
-        res.json({
+        return res.json({
           success:true, 
           msg:'Item successfully deleted'
         })
       })
     })
     .catch(err=>{
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
-        msg: "Error when deleting item",
+        msg: "An error has occured while deleting the post",
         error: err
       })
     })

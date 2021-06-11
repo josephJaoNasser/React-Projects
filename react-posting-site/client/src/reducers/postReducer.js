@@ -5,7 +5,10 @@ import {
   NEW_POST_SENT,
   POST_ERRORS, 
   DELETE_POST, 
+  UPDATE_POST,
   POSTS_LOADING,
+  SET_SUCCESS_MESSAGE,
+  CLEAR_SUCCESS_MESSAGE,
   CLEAR_ERRORS,
 } from '../actions/types'
 
@@ -13,7 +16,8 @@ const initialState = {
   posts: [],
   isLoading: false,
   isSendingPost: false,
-  error: null
+  error: null,
+  successMessage: null
 }
 
 const postReducer = (state = initialState, action) => {
@@ -47,6 +51,13 @@ const postReducer = (state = initialState, action) => {
         posts: [action.post, ...state.posts],
         error: null
       };
+    
+    case UPDATE_POST: 
+      return {
+        ...state,
+        posts: state.posts.map(post => post._id === action.post._id ? action.post : post),
+        isLoading:false
+      }
 
     case DELETE_POST:
       return {
@@ -70,6 +81,18 @@ const postReducer = (state = initialState, action) => {
         }
       }
     
+    case SET_SUCCESS_MESSAGE:
+      return {
+        ...state,
+        successMessage: action.successMessage
+      }
+    
+      case CLEAR_SUCCESS_MESSAGE:
+        return {
+          ...state,
+          successMessage: null
+        }
+
     case CLEAR_ERRORS:
       return{
         ...state,

@@ -2,13 +2,12 @@
     POSTS MANAGEMENT
 **********************/
 
-//fetching posts
+// CRUD for Posts
 export const FETCH_POSTS = 'FETCH_POSTS';
 export const FETCH_POSTS_FAILED = 'FETCH_POSTS_FAILED';
-
-// CRUD for Posts
 export const NEW_POST_SENDING = 'NEW_POST_SENDING'
 export const NEW_POST_SENT = 'NEW_POST'
+export const UPDATE_POST = 'UPDATE_POST'
 export const DELETE_POST = 'DELETE_POST'
 
 // Loading states
@@ -16,6 +15,10 @@ export const POSTS_LOADING = 'POSTS_LOADING'
 
 // other errors / errpr management 
 export const POST_ERRORS = 'POST_ERRORS'
+
+//success message
+export const SET_SUCCESS_MESSAGE = 'SET_SUCCESS_MESSAGE'
+export const CLEAR_SUCCESS_MESSAGE = 'CLEAR_SUCCESS_MESSAGE'
 
 /*********************
     USER MANAGEMENT

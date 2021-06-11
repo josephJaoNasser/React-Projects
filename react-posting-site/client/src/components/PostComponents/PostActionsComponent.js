@@ -29,7 +29,7 @@ const PostActionsComponent = ({ onPostSubmit,isSendingPost }) => {
         {
           isSendingPost ? 
             <CircularProgress 
-              color='default'
+              color='inherit'
               size={24}
             /> 
           : 'Post'

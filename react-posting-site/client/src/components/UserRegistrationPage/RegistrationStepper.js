@@ -11,6 +11,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     margin: '0 auto'
+  },
+  transparentBackground:{
+    background: 'rgba(0, 0, 0, 0)'
   }
 }));
 
@@ -21,7 +24,13 @@ const RegistrationStepper = () => {
   
   return (
     <div className={classes.root}>
-      <Stepper activeStep={activeStep} alternativeLabel>
+      <Stepper 
+        activeStep={activeStep} 
+        alternativeLabel
+        classes={{
+          root: classes.transparentBackground
+        }}
+      >
         {steps.map((label) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>

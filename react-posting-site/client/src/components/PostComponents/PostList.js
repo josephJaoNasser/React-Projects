@@ -4,24 +4,33 @@ import PropTypes from 'prop-types'
 //material ui
 import {
   CircularProgress,
-  Slide,
+  Slide,  
+  Snackbar,
   List 
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 
 //redux
 import { connect } from 'react-redux'
-import { fetchPosts, deletePost } from '../../actions/postActions'
+import { fetchPosts, deletePost, editPost } from '../../actions/postActions'
 
 //components
 import PostItem from './PostItem'
 
+const Alert = (props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 //component
 const PostList = (props) => { 
   const {  
-    posts, 
-    fetchPosts,
     deletePost,
-    isLoading
+    editPost,
+    error,
+    fetchPosts,
+    isLoading,
+    posts,
+    successMessage
   } = props
   
   //---lifecycle functions ---
@@ -54,6 +63,7 @@ const PostList = (props) => {
                 key={post._id} 
                 post={post}  
                 onDelete={id => deletePost(id)}
+                onEdit={(id, changes)=> editPost(id, changes)}
                 onDoubleClick={()=>{}}            
               />
             ))
@@ -61,6 +71,24 @@ const PostList = (props) => {
           : <i>{ "No posts to show..." }</i>
         }
       </List>   
+      <Snackbar
+        anchorOrigin={{ vertical:'top', horizontal:'center' }} 
+        open={error}         
+        autoHideDuration={3000}
+      >
+        <Alert severity="error">
+          {error?.msg}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical:'top', horizontal:'center' }} 
+        open={Boolean(successMessage?.length)} 
+        autoHideDuration={3000}
+      >
+        <Alert severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </> 
   )
 }
@@ -68,13 +96,18 @@ const PostList = (props) => {
 PostList.propTypes = {
   fetchPosts: PropTypes.func.isRequired,
   deletePost: PropTypes.func,
+  editPost: PropTypes.func,
   posts: PropTypes.array.isRequired,
-  isLoading: PropTypes.bool
+  isLoading: PropTypes.bool,
+  error: PropTypes.object,
+  successMessage: PropTypes.string
 }
 
 const mapStateToProps = state => ({
   posts: state.posts.posts,
-  isLoading: state.posts.isLoading
+  isLoading: state.posts.isLoading,
+  error: state.posts.error,
+  successMessage: state.posts.successMessage
 })  
 
-export default connect(mapStateToProps, { fetchPosts, deletePost })(PostList)
+export default connect(mapStateToProps, { fetchPosts, deletePost, editPost })(PostList)

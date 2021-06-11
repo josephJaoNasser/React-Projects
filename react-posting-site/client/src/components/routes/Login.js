@@ -10,16 +10,16 @@ import { login } from '../../actions/authActions'
 import { makeStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 import { 
-  Card,
-  TextField,
-  IconButton,
-  InputAdornment,  
-  Container,
-  CardContent,
   Button,
-  Snackbar,
+  Card,
+  CardContent,
   CircularProgress,
-  Link as MaterialUiLink
+  Container,
+  IconButton,
+  InputAdornment,
+  Link as MaterialUiLink,
+  Snackbar,
+  TextField,
 } from '@material-ui/core'
 import {
   Visibility,
@@ -87,7 +87,7 @@ const Login = (props) => {
   }
 
   return (
-    <div>
+    <Container>
       <Header justifyContent='center'/>
       <Snackbar
         anchorOrigin={{ vertical:'top', horizontal:'center' }} 
@@ -171,7 +171,7 @@ const Login = (props) => {
               
         </Card>
       </Container>
-    </div>
+    </Container>
   )
 }
 

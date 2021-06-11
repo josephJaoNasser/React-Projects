@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { registerUser } from '../../actions/authActions'
 
 //material ui
-import { CircularProgress,Button, Snackbar } from '@material-ui/core'
+import { Container, CircularProgress,Button, Snackbar } from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert';
 import Header from '../Header'
 
@@ -81,44 +81,46 @@ const Register = ({ registerUser, isLoading, error, token }) => {
         <CircularProgress/>
       }
     >
-      <Header title="Register | Post App" justifyContent='center'/>
-      <StepperContext.Provider value={{activeStep, stepList}}>        
-        <RegistrationStepper />       
-        <SetActiveStepFunction.Provider value={setActiveStep}>
-          <UserInfoState.Provider value={{userInfo, setUserInfo}}>
-            <RegistrationForm/>     
-          </UserInfoState.Provider>                          
-        </SetActiveStepFunction.Provider>          
-      </StepperContext.Provider>  
+      <Container className='registration-main-container'>
+        <Header title="Register | Post App" justifyContent='center'/>
+        <StepperContext.Provider value={{activeStep, stepList}}>        
+          <RegistrationStepper />       
+          <SetActiveStepFunction.Provider value={setActiveStep}>
+            <UserInfoState.Provider value={{userInfo, setUserInfo}}>
+              <RegistrationForm/>     
+            </UserInfoState.Provider>                          
+          </SetActiveStepFunction.Provider>          
+        </StepperContext.Provider>  
 
-      <Snackbar
-        anchorOrigin={{ vertical:'top', horizontal:'center' }} 
-        open={!message.success} 
-        onClose={resetMessage}
-        autoHideDuration={6000}
-      >
-        <Alert onClose={resetMessage} severity="error">
-          {message.msg}
-        </Alert>
-      </Snackbar>
-      
-      {
-        activeStep === 4 &&
-        <div className='confirm-register'>
-          <Button 
-            onClick={()=>setActiveStep((prevActiveStep)=> prevActiveStep -1)}
-          >
-            Back
-          </Button>
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={()=>registerUser(userInfo)}
-          >
-            Register now!
-          </Button>
-        </div>          
-      }
+        <Snackbar
+          anchorOrigin={{ vertical:'top', horizontal:'center' }} 
+          open={!message.success} 
+          onClose={resetMessage}
+          autoHideDuration={6000}
+        >
+          <Alert onClose={resetMessage} severity="error">
+            {message.msg}
+          </Alert>
+        </Snackbar>
+        
+        {
+          activeStep === 4 &&
+          <div className='confirm-register'>
+            <Button 
+              onClick={()=>setActiveStep((prevActiveStep)=> prevActiveStep -1)}
+            >
+              Back
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary"
+              onClick={()=>registerUser(userInfo)}
+            >
+              Register now!
+            </Button>
+          </div>          
+        }
+      </Container>
     </Suspense>    
   )
 }

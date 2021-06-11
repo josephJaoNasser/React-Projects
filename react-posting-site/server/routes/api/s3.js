@@ -42,7 +42,7 @@ const getFile = async (fileKey, bucket) => {
     Key: fileKey,
     Bucket: bucket
   }
-
+  
   const res = await s3.getObject(downloadParams).createReadStream()
   return res
 }

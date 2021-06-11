@@ -1,40 +1,24 @@
-import React, { useState } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
 //material ui
 import {
   Button,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle
 }from '@material-ui/core'
-import { DeleteOutline } from '@material-ui/icons';
 
 
-const ConfirmDeleteModal = ({ onConfirm }) => {
-  const [open, setOpen] = useState(false);
+const DeletePost = ({ onConfirm, onCancel, open=false }) => {
   
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   return (
-    <div>
-      <IconButton
-        onClick={ handleClickOpen }
-        color="secondary"      
-        >
-          <DeleteOutline/>
-      </IconButton>
+    <div>     
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={onCancel}
         aria-labelledby="responsive-dialog-title"
       >
         <DialogTitle id="responsive-dialog-title">{"Delete post?"}</DialogTitle>
@@ -47,14 +31,13 @@ const ConfirmDeleteModal = ({ onConfirm }) => {
           <Button 
             autoFocus 
             onClick={()=> {
-              handleClose()
               onConfirm()
             }} 
             color="secondary"
           >
             Delete post
           </Button>
-          <Button onClick={handleClose} color="default" autoFocus>
+          <Button onClick={onCancel} color="default" autoFocus>
             Cancel
           </Button>
         </DialogActions>
@@ -63,4 +46,10 @@ const ConfirmDeleteModal = ({ onConfirm }) => {
   );
 }
 
-export default ConfirmDeleteModal
+DeletePost.propTypes = {
+  onConfirm: PropTypes.func,
+  onCancel: PropTypes.func,
+  open: PropTypes.bool
+}
+
+export default DeletePost

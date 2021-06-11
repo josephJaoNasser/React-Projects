@@ -6,7 +6,12 @@ import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 //router
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
+import { 
+  BrowserRouter as Router, 
+  Route, 
+  Redirect, 
+  Switch 
+} from 'react-router-dom'
 
 //redux
 import { connect } from 'react-redux'
@@ -23,14 +28,12 @@ const useStyles = makeStyles(theme=> ({
   mainContainer:{
     [theme.breakpoints.up('sm')]: {
       display: 'flex',
-      //flexFlow: 'row-reverse'
     },
     [theme.breakpoints.down('xs')]: {
       display: 'block',
     }
   }
 }))
-
 
 //component main
 function App(props) { 
