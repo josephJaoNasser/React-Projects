@@ -1,47 +1,55 @@
-import React, { useState } from 'react'
+import React, { useState, createContext, useContext } from 'react'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
+const ThemeSetter = createContext()
+const ThemeMode = createContext()
 
-const ThemeContext = ({ children }) => {
-  const [themeMode, setThemeMode] = useState('light')
+export function useSetThemeMode(){
+  return useContext(ThemeSetter) 
+}
 
-  //material UI theming
-  let paperColor;
-  let mainTextColor;
+export function useThemeMode(){
+  return useContext(ThemeMode)
+}
 
-  if(themeMode === 'dark'){
-    paperColor = '#303030'
-    mainTextColor = '#0089f5'
-  }
+export const ThemeContext = ({ children }) => {
+  const [isDarkTheme, setIsDarkTheme] = useState(true)
 
   const theme = createMuiTheme({
     palette: {
-      type: themeMode,
+      type: isDarkTheme ? 'dark' : 'light',
       primary: {
-        main: mainTextColor ? mainTextColor : '#015fa9'
+        main: '#015fa9',
+        dark: '#0089f5'
+      },
+      error: {
+        main: '#f44336',
+        light: '#e57373',
+        dark: '#d32f2f'
       },
       background: {
-        paper: paperColor ? paperColor : '#fff' 
+        paper: isDarkTheme ? '#303030' : '#fff' 
       }
     },
     typography: {
       button: {
         textTransform: 'none'
       }
-    }
+    },
+    
   })
-
-
 
   return (    
     <>
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider> 
+        <ThemeProvider theme={theme}>
+          <ThemeMode.Provider value={ isDarkTheme }>
+            <ThemeSetter.Provider value={ setIsDarkTheme }>
+              {children}
+            </ThemeSetter.Provider>
+          </ThemeMode.Provider>
+        </ThemeProvider> 
     </>
   )
 }
-
-export default ThemeContext

@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react'
+import React, { useState,createContext, useContext } from 'react'
 
 /* =====================
   Image attatchment context
  =======================*/ 
-const AttatchedImageContext = React.createContext()
-const UpdateImageContext = React.createContext()
+const AttatchedImageContext = createContext()
+const UpdateImageContext = createContext()
 
 export function useImageAttatchments(){
   return useContext(AttatchedImageContext)

@@ -2,11 +2,11 @@ import './App.css';
 import { lazy, Suspense, useEffect } from 'react'
 
 //material ui
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 //theme provider
-import ThemeContext from './components/ThemeContext'
+import { ThemeContext } from './components/ThemeContext'
 
 //router
 import { 
@@ -85,51 +85,53 @@ function App(props) {
   return (    
     <div className="App">    
       <ThemeContext>
-        <Router>          
-          <div className={classes.mainContainer}>        
-            {
-              (user && token) &&
-              <Suspense fallback={<NavigationPlaceholder/>}>
-                <Navigation user={user}/>
-              </Suspense>
-            }   
-            <Suspense
-              fallback={
-                <div style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%,-50%)"
-                }}>
-                  <CircularProgress/>
-                </div>            
-              }
-            >
-              <Switch>
-                <Route path="/" exact >
-                  { checkGuest(<Home/>) }
-                </Route> 
+        <Paper style={{height: '100vh',overflowY: 'auto'}}>        
+          <Router>          
+            <div className={classes.mainContainer}>        
+              {
+                (user && token) &&
+                <Suspense fallback={<NavigationPlaceholder/>}>
+                  <Navigation user={user}/>
+                </Suspense>
+              }   
+              <Suspense
+                fallback={
+                  <div style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%,-50%)"
+                  }}>
+                    <CircularProgress/>
+                  </div>            
+                }
+              >
+                <Switch>
+                  <Route path="/" exact >
+                    { checkGuest(<Home/>) }
+                  </Route> 
 
-                <Route path="/login">
-                  { checkLoggedIn('/',<Login/>) }  
-                </Route>     
+                  <Route path="/login">
+                    { checkLoggedIn('/',<Login/>) }  
+                  </Route>     
 
-                <Route path="/register">
-                  { checkLoggedIn('/',<Register/>) }
-                </Route>
+                  <Route path="/register">
+                    { checkLoggedIn('/',<Register/>) }
+                  </Route>
 
-                <Route path="/about">
-                  <About/>
-                </Route>
+                  <Route path="/about">
+                    <About/>
+                  </Route>
 
-                <Route path="/:username">
-                  <Profile/>  
-                </Route>
+                  <Route path="/:username">
+                    <Profile/>  
+                  </Route>
 
-              </Switch>
-            </Suspense>  
-          </div>            
-        </Router>          
+                </Switch>
+              </Suspense>  
+            </div>            
+          </Router>          
+        </Paper>
       </ThemeContext> 
     </div>    
   );

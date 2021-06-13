@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx';
 
+//context for setting the theme mode
+import { useThemeMode, useSetThemeMode } from './ThemeContext'
+
 //router
 import { Link, useLocation } from 'react-router-dom'
 
@@ -26,7 +29,7 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Typography,
+  Typography
 }  from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -34,6 +37,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import MenuIcon from '@material-ui/icons/Menu';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
+import EmojiObjectsOutlinedIcon from '@material-ui/icons/EmojiObjectsOutlined';
 import { useTheme } from '@material-ui/core/styles';
 
 //import navigation styles from external file because it's too long
@@ -50,9 +55,11 @@ const Navigation = (props) => {
   const currentLocation = useLocation().pathname
   const classes = useStyles();
   const theme = useTheme();
+  const themeMode = useThemeMode()
+  const setThemeMode = useSetThemeMode()
   const [open, setOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false)
-
+  
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
@@ -127,11 +134,24 @@ const Navigation = (props) => {
 
       <Divider />
 
+      <List>
+        <ListItem button onClick={()=>setThemeMode(!themeMode)}>
+          <ListItemIcon>
+            {themeMode ? <EmojiObjectsOutlinedIcon/> : <EmojiObjectsIcon/>}
+          </ListItemIcon>
+          <ListItemText>
+            {themeMode ? 'Dark' : 'Light'} Mode
+          </ListItemText>
+        </ListItem>
+      </List>
+
+      <Divider />
+
       <List>         
-        <ListItem>
+        <ListItem color='error'>
           <Button 
-          variant='outlined' 
-          color='secondary'        
+          variant='outlined'   
+          color='secondary'
           fullWidth
           onClick={handleLogoutToggle}
           startIcon={<ExitToAppIcon/>}

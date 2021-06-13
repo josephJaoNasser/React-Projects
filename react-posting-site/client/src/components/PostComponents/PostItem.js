@@ -7,6 +7,7 @@ import moment from 'moment'
 //material ui
 import {  
   Avatar,
+  Divider,
   IconButton,
   Link as MaterialUiLink,
   ListItem,
@@ -21,7 +22,8 @@ import {
   MoreVert, 
   ErrorOutline, 
   DeleteOutline, 
-  Edit as EditIcon
+  Edit as EditIcon,
+  BugReportOutlined as BugReportOutlinedIcon
 } from '@material-ui/icons';
 
 
@@ -156,9 +158,23 @@ const PostItem = ({post, onDelete, onEdit}) => {
               </div>   
               : 
               <MenuItem>
-                <ErrorOutline/>&nbsp;&nbsp;Report
+                <ListItemIcon>
+                  <ErrorOutline/>
+                </ListItemIcon>
+                <ListItemText>
+                  Report
+                </ListItemText>                
               </MenuItem>
             }
+            <Divider/>
+            <MenuItem>
+              <ListItemIcon>
+                <BugReportOutlinedIcon/>
+              </ListItemIcon>
+              <ListItemText>
+                Report a bug
+              </ListItemText>                
+            </MenuItem>
           </Menu>  
 
         </div>
