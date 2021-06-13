@@ -61,7 +61,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   mobileDrawer: {
-    position:'absolute'
+    position:'absolute',
+    [theme.breakpoints.up('sm')]: {
+      display: 'none',
+    },
   },
   mobileDrawerOpen: {
     width: drawerWidth, 

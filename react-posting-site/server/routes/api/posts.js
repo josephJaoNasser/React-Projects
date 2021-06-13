@@ -22,7 +22,9 @@ const uploadToMemory = multer({storage: memoryStorage}).array('post-media',4)
 // @desc get all posts
 // @access public
 router.get('/', async(req, res)=> {  
-  Post.find()
+  const username = req.query.user
+
+  Post.find(username?.length ? {"user.uname": username} : {})
     .sort({ createdAt: -1 })
     .then(posts => res.json(posts))
 })

@@ -17,7 +17,8 @@ import { Container,
 
 //components
 import Header from '../Header'
-const PostList = lazy(()=> import('../PostComponents/PostList'))
+import PostList from '../PostComponents/PostList'
+//const PostList = lazy(()=> import('../PostComponents/PostList'))
 const AddPost = lazy(()=> import('../PostComponents/AddPost')) 
 
 
@@ -35,9 +36,9 @@ const Home = () => {
         <ImageAttatchmentsContext>
           <AddPost/> 
         </ImageAttatchmentsContext>
-        <Divider style={{marginTop: '1em', height: '1em'}}/>
-        <PostList />
       </Suspense>
+      <Divider style={{marginTop: '1em', height: '1em'}}/>
+      <PostList />
     </Container>
       
   )

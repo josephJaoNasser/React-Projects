@@ -63,11 +63,6 @@ const Register = ({ registerUser, isLoading, error, token }) => {
     }    
   }, [error])
 
-  useEffect(()=> {
-    if(token){
-      alert('EYYY REGISTERED BOII')
-    }
-  }, [token])
 
   //functions
   const resetMessage = () => {

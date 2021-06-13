@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, lazy, Suspense } from 'react'
 import PropTypes from 'prop-types'
+import PostItemPlaceholder from './PostItemPlaceholder';
 
 //material ui
 import {
@@ -14,16 +15,18 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { connect } from 'react-redux'
 import { fetchPosts, deletePost, editPost } from '../../actions/postActions'
 
-//components
-import PostItem from './PostItem'
 
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+//lazy components
+const PostItem = lazy(()=>import('./PostItem'))
+
 //component
 const PostList = (props) => { 
   const {  
+    username,
     deletePost,
     editPost,
     error,
@@ -32,15 +35,14 @@ const PostList = (props) => {
     posts,
     successMessage
   } = props
-  
   //---lifecycle functions ---
-  useEffect(()=> {   
+  useEffect(()=> {       
     const getPosts = async() => {
-      await fetchPosts()
+      await fetchPosts(username)
     }
     getPosts()
-  },[fetchPosts])
-
+  },[fetchPosts, username])
+  
 
   // --- html ---
   return (   
@@ -58,17 +60,19 @@ const PostList = (props) => {
       <List>
         { 
           posts?.length ?
-            posts.map((post) => (                         
-              <PostItem    
-                key={post._id} 
-                post={post}  
-                onDelete={id => deletePost(id)}
-                onEdit={(id, changes)=> editPost(id, changes)}
-                onDoubleClick={()=>{}}            
-              />
+            posts.map((post) => (  
+              <Suspense key={post._id} fallback={<PostItemPlaceholder/>}>
+                <PostItem    
+                  key={post._id} 
+                  post={post}  
+                  onDelete={id => deletePost(id)}
+                  onEdit={(id, changes)=> editPost(id, changes)}
+                  onDoubleClick={()=>{}}            
+                />
+              </Suspense>                       
             ))
           
-          : <i>{ "No posts to show..." }</i>
+          : "..." 
         }
       </List>   
       <Snackbar
@@ -94,6 +98,7 @@ const PostList = (props) => {
 }
 
 PostList.propTypes = {
+  username: PropTypes.string,
   fetchPosts: PropTypes.func.isRequired,
   deletePost: PropTypes.func,
   editPost: PropTypes.func,

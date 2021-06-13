@@ -6,6 +6,7 @@ import {
   POST_ERRORS,
   DELETE_POST, 
   UPDATE_POST,
+  RESET_POSTS,
   POSTS_LOADING,
   SET_SUCCESS_MESSAGE,
   CLEAR_SUCCESS_MESSAGE
@@ -15,10 +16,14 @@ import { tokenConfig } from '../actions/authActions'
 
 const url = "/v1/posts/"  
 
-export const fetchPosts = () => dispatch => { 
-  dispatch(setPostsLoading());
-     
-  axios.get(url).then(res => dispatch({
+export const fetchPosts = (username) => dispatch => { 
+  
+  dispatch({type: RESET_POSTS});
+  dispatch({type: POSTS_LOADING});
+
+  let query = url+ (username ? `?user=${username}` : '')
+
+  axios.get(query).then(res => dispatch({
       type: FETCH_POSTS,
       posts: res.data
     })
@@ -118,10 +123,4 @@ export const deletePost = (postId) => (dispatch, getState) => {
     }
   })     
 }
-
-export const setPostsLoading = () => { 
-  return{
-    type: POSTS_LOADING,
-  }
-} 
 

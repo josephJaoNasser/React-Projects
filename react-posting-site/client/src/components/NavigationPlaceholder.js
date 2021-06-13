@@ -27,6 +27,7 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  CircularProgress,
 }  from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -42,7 +43,6 @@ import useStyles from './NavigationDrawerStyles'
 // component main
 const Navigation = (props) => {
   const {
-    user,
     window,
     logout
   }=props  
@@ -66,16 +66,15 @@ const Navigation = (props) => {
   }
 
   const container = window !== undefined ? () => window().document.body : undefined;
-  const profilImageUrl = user.profile_image ? `/v1/users/${user._id}/profile-image/${user.profile_image}?size=small` : ''
 
   // drawer items
   const drawerItems = (
     <>
       <List>
-        <Link to={`/${user.uname}`} style={{color: 'unset', textDecoration: 'none'}}>
-          <ListItem button selected={currentLocation === `/${user.uname}`}>
+        <Link to={`/`} style={{color: 'unset', textDecoration: 'none'}}>
+          <ListItem button >
             <Avatar 
-              src={profilImageUrl} 
+              src='' 
               className={clsx(classes.avatar,{
                 [classes.avatarDrawerOpen]: open,
                 [classes.avatarDrawerClose]: !open,
@@ -87,10 +86,10 @@ const Navigation = (props) => {
                   variant="h5" 
                   component="h5"                   
                 >
-                    {user.dname}
+                    <CircularProgress/>
                 </Typography>
               } 
-              secondary={user.uname}      
+              secondary='Loading user...'      
               className={clsx({
                 [classes.userTextOpen]: open,
                 [classes.userTextClosed]: !open,
@@ -211,7 +210,6 @@ const Navigation = (props) => {
         <ConfirmLogout 
           onConfirm={()=> onLogoutConfirm()} 
           onCancel={handleLogoutToggle}
-          username={user.uname}
           open={logoutOpen}
         />
         <Hidden smUp implementation="css">
@@ -251,7 +249,6 @@ const Navigation = (props) => {
 }
 
 Navigation.propTypes = {
-  user: PropTypes.object.isRequired,
   logout: PropTypes.func
 }
 

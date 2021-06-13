@@ -10,6 +10,9 @@ export const NEW_POST_SENT = 'NEW_POST'
 export const UPDATE_POST = 'UPDATE_POST'
 export const DELETE_POST = 'DELETE_POST'
 
+// reset posts
+export const RESET_POSTS = 'RESET_POSTS'
+
 // Loading states
 export const POSTS_LOADING = 'POSTS_LOADING'
 
@@ -19,6 +22,7 @@ export const POST_ERRORS = 'POST_ERRORS'
 //success message
 export const SET_SUCCESS_MESSAGE = 'SET_SUCCESS_MESSAGE'
 export const CLEAR_SUCCESS_MESSAGE = 'CLEAR_SUCCESS_MESSAGE'
+
 
 /*********************
     USER MANAGEMENT

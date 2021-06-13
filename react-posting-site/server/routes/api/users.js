@@ -48,7 +48,7 @@ router.get('/',(req, res)=> {
       })
     }
     else{
-      return res.json({
+      return res.status(404).json({
         msg: 'User not found'
       })
     }

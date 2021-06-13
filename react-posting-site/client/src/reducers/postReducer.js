@@ -6,6 +6,7 @@ import {
   POST_ERRORS, 
   DELETE_POST, 
   UPDATE_POST,
+  RESET_POSTS,
   POSTS_LOADING,
   SET_SUCCESS_MESSAGE,
   CLEAR_SUCCESS_MESSAGE,
@@ -70,6 +71,12 @@ const postReducer = (state = initialState, action) => {
         ...state,
         isLoading: true
       };
+
+    case RESET_POSTS:
+      return {
+        ...state,
+        posts: []
+      }
 
     case POST_ERRORS:
       return {

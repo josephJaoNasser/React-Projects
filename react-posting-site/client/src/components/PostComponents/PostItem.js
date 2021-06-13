@@ -100,7 +100,11 @@ const PostItem = ({post, onDelete, onEdit}) => {
             secondaryTypographyProps={{variant:"caption"}}      
           />
 
-          <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleActionsOpen}>
+          <IconButton 
+            aria-controls="simple-menu" 
+            aria-haspopup="true" 
+            onClick={handleActionsOpen}
+          >
             <MoreVert/>
           </IconButton>
 
