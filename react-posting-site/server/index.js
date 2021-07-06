@@ -5,15 +5,16 @@ const path = require('path')
 
 const app = express()
 
-//body parser
 app.use(express.json())
 
-//DB config
+/********************************
+ *         DB config
+********************************/
 const db = process.env.MONGO_URI
 
 //connect to mongo
 mongoose.connect(db,{ 
-  useNewUrlParser: true,
+  useNewUrlParser: true, 
   useUnifiedTopology: true,
   useCreateIndex:true
 })
@@ -21,7 +22,12 @@ mongoose.connect(db,{
   .catch(err=> console.log(err))
 
 
-//define and use routes
+
+
+
+/********************************
+ *         ROUTES
+********************************/
 const posts = require('./routes/api/posts')
 const users = require('./routes/api/users')
 const auth = require('./routes/api/auth')
@@ -30,7 +36,12 @@ app.use('/v1/posts', posts)
 app.use('/v1/users', users)
 app.use('/v1/auth', auth)
 
-//serve static assets if in production
+
+
+
+/********************************
+ *   SERVE STATIC ASSETS IN PRODUCTION
+********************************/
 if(process.env.NODE_ENV === 'production'){
   //set static folder
   app.use(express.static('../client/build'))
@@ -40,7 +51,12 @@ if(process.env.NODE_ENV === 'production'){
 }
 
 
-//define port
+
+
+
+/********************************
+ *          PORT
+********************************/
 const port = process.env.PORT || 5001
 
 app.listen(port, ()=> console.log(`Server started on port ${port}`) )

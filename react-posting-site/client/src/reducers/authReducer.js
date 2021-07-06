@@ -34,7 +34,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         token: null,
         user: null,
-        isLoading: false
+        isLoading: false,
+        isAuthenticated: false
       }
 
     case USERS_LOADING:

@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext } from 'react'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+//import { connect } from 'react-redux'
 
 const ThemeSetter = createContext()
 const ThemeMode = createContext()
@@ -13,8 +14,13 @@ export function useThemeMode(){
   return useContext(ThemeMode)
 }
 
-export const ThemeContext = ({ children }) => {
-  const [isDarkTheme, setIsDarkTheme] = useState(true)
+const ThemeContext = ({ children }) => {  
+  const [isDarkTheme, setIsDarkTheme] = useState(JSON.parse(localStorage.getItem('isDarkTheme')))
+
+  const handleThemeChange = ()=> {    
+    setIsDarkTheme(!isDarkTheme)
+    localStorage.setItem('isDarkTheme', !isDarkTheme)   
+  }
 
   const theme = createMuiTheme({
     palette: {
@@ -45,11 +51,23 @@ export const ThemeContext = ({ children }) => {
       <CssBaseline />
         <ThemeProvider theme={theme}>
           <ThemeMode.Provider value={ isDarkTheme }>
-            <ThemeSetter.Provider value={ setIsDarkTheme }>
-              {children}
+            <ThemeSetter.Provider value={ handleThemeChange }>
+              { children }
             </ThemeSetter.Provider>
           </ThemeMode.Provider>
         </ThemeProvider> 
     </>
   )
 }
+
+export default ThemeContext
+
+// const mapStateToProps = (state) => ({
+//   isDarkTheme: state.themeMode.isDarkTheme
+// })
+
+// const mapDispatchToProps = (dispatch)=> ({
+//     dispatchTheme: (mode) => dispatch({type: 'SWITCH_THEME_MODE', payload: mode})  
+// })
+
+// export default connect(mapStateToProps, mapDispatchToProps)(ThemeContext)

@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { useThemeMode, useSetThemeMode } from './ThemeContext'
 
 //router
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useHistory } from 'react-router-dom'
 
 //redux
 import { connect } from 'react-redux'
@@ -53,6 +53,7 @@ const Navigation = (props) => {
   }=props  
   
   const currentLocation = useLocation().pathname
+  const history = useHistory()
   const classes = useStyles();
   const theme = useTheme();
   const themeMode = useThemeMode()
@@ -69,6 +70,7 @@ const Navigation = (props) => {
   }
 
   const onLogoutConfirm = () => {
+    history.push('/')
     logout()
   }
 

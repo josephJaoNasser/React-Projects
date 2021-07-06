@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 
-
 //material ui
 import {  
   Avatar,
   Divider,
   IconButton,
   Link as MaterialUiLink,
+  List,
   ListItem,
   ListItemAvatar,
   ListItemIcon,
@@ -19,11 +19,12 @@ import {
   Typography,
 } from '@material-ui/core';
 import { 
-  MoreVert, 
+  MoreHoriz, 
   ErrorOutline, 
   DeleteOutline, 
   Edit as EditIcon,
-  BugReportOutlined as BugReportOutlinedIcon
+  BugReportOutlined as BugReportOutlinedIcon,
+  Link as LinkIcon
 } from '@material-ui/icons';
 
 
@@ -83,22 +84,16 @@ const PostItem = ({post, onDelete, onEdit}) => {
         <div className="contents-head" style={{display:'flex'}}>
           <ListItemText
             primary={
-              <React.Fragment>
-                <MaterialUiLink 
-                  color='inherit' 
-                  component={Link}
-                  to={`/${post.user.uname}`}
-                  >
-                  {post.user.dname ??  post.user.dname}
-                </MaterialUiLink>
-              </React.Fragment>
+              <MaterialUiLink 
+                color='inherit' 
+                component={Link}
+                to={`/${post.user.uname}`}
+                >
+                {post.user.dname ??  post.user.dname}
+              </MaterialUiLink>
             }
             primaryTypographyProps={{variant:"subtitle2"}}
-            secondary={
-              <React.Fragment>
-                { `@${post.user.uname} - ${moment(post.createdAt).fromNow()}` }        
-              </React.Fragment>            
-            }    
+            secondary={ `@${post.user.uname} - ${moment(post.createdAt).fromNow()}` }    
             secondaryTypographyProps={{variant:"caption"}}      
           />
 
@@ -107,7 +102,7 @@ const PostItem = ({post, onDelete, onEdit}) => {
             aria-haspopup="true" 
             onClick={handleActionsOpen}
           >
-            <MoreVert/>
+            <MoreHoriz/>
           </IconButton>
 
           <EditPost 
@@ -126,56 +121,73 @@ const PostItem = ({post, onDelete, onEdit}) => {
             }} 
             onCancel={confirmDeleteToggle}
           />
-
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleActionsClose}            
-          >
-            {
-              post.user._id === store.getState().auth.user._id ?
-              <div>
-                <MenuItem onClick={editFormToggle}>
+          {
+            store.getState().auth.user ? 
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleActionsClose}            
+            >
+              {
+                post.user._id === store.getState().auth.user?._id ?
+                <List>
+                  <MenuItem onClick={editFormToggle}>
+                    <ListItemIcon>
+                      <EditIcon/>
+                    </ListItemIcon>
+                    <ListItemText>
+                      Edit
+                    </ListItemText>                  
+                  </MenuItem>
+                  <MenuItem onClick={confirmDeleteToggle}>
+                    <ListItemIcon>
+                      <DeleteOutline color='secondary'/>                    
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography color='secondary'>
+                        Delete
+                      </Typography>
+                    </ListItemText>                  
+                  </MenuItem>
+                </List>   
+                : 
+                <MenuItem>
                   <ListItemIcon>
-                    <EditIcon/>
+                    <ErrorOutline/>
                   </ListItemIcon>
                   <ListItemText>
-                    Edit
-                  </ListItemText>                  
+                    Report
+                  </ListItemText>                
                 </MenuItem>
-                <MenuItem onClick={confirmDeleteToggle}>
-                  <ListItemIcon>
-                    <DeleteOutline color='secondary'/>                    
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography color='secondary'>
-                      Delete
-                    </Typography>
-                  </ListItemText>                  
-                </MenuItem>
-              </div>   
-              : 
+              }
+              <Divider/>
               <MenuItem>
                 <ListItemIcon>
-                  <ErrorOutline/>
+                  <BugReportOutlinedIcon/>
                 </ListItemIcon>
                 <ListItemText>
-                  Report
+                  Report a bug
                 </ListItemText>                
               </MenuItem>
-            }
-            <Divider/>
-            <MenuItem>
-              <ListItemIcon>
-                <BugReportOutlinedIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                Report a bug
-              </ListItemText>                
-            </MenuItem>
-          </Menu>  
+            </Menu>  
+            :
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleActionsClose}            
+            >
+              <MenuItem>
+                <ListItemIcon>
+                  <LinkIcon/>
+                </ListItemIcon>
+                <ListItemText>
+                  Copy link to post
+                </ListItemText>                
+              </MenuItem>
+            </Menu>
+          }
 
         </div>
         <div className='contents-body'>

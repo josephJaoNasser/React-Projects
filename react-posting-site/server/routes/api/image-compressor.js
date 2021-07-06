@@ -1,5 +1,6 @@
 const sharp = require('sharp');
 
+
 const compressSingle = async (file, res, next) => {
     
   let compressedFiles =[];
@@ -66,22 +67,7 @@ const compressSingle = async (file, res, next) => {
           errors = err
       })
  
-  newFile = {...file};  
-  const filenameTiny = file.filename.replace(/(\.[\w\d_-]+)$/i, '_tiny$1') 
   
-  await sharp(file.buffer)
-      .resize(60)
-      .toFormat("jpeg")
-      .jpeg({ quality: 70 })
-      .toBuffer({resolveWithObject:true})
-      .then((output)=>{
-          newFile.filename = filenameTiny
-          newFile.buffer = output.data
-          newFile.size = output.info.size
-          compressedFiles.push(newFile)
-      }).catch((err)=>{
-          errors = err
-      })   
 
   if(errors){
     return {

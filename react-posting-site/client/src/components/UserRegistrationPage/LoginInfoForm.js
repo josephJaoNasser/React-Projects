@@ -65,37 +65,48 @@ const LoginInfoForm = () => {
   };
 
   //check 
-  const checkInput = async () => {  
+  const checkInput = async() => {  
     let checked;
+
+    //check if user typed something
+    if(!usernameState.username.length){
+      setUsername({ 
+        ...usernameState, 
+        usernameHasError: true, 
+        usernameHelperText: 'Please enter a username' 
+      });
+      return false
+    }    
+
+    //check for duplicate username
     await axios({
-      url: `/v1/users/?username=${usernameState.username}`,
+      url:`/v1/users/?username=${usernameState.username}`,
       method: 'GET'
-    })
-    .then( res => {
-      if(!usernameState.username.length){
-        setUsername({ 
-          ...usernameState, 
-          usernameHasError: true, 
-          usernameHelperText: 'Please enter a username' 
-        });
-        return false
-      }
-      else if(res.data.user){
+    }).then(res => {
+      if(res.data.user){
         setUsername({ 
           ...usernameState, 
           usernameHasError: true, 
           usernameHelperText: 'Sorry... that username is taken...' 
         });
-        return false
+        return true
       }
-      else{
-        setUsername({ 
-          ...usernameState, 
-          usernameHasError: false,
-          usernameHelperText: '' 
-        });
-      }
+
+      return false
+
+    }).then(isTaken=> {     
   
+      if(isTaken){
+        return false
+      }  
+
+      setUsername({ 
+        ...usernameState, 
+        usernameHasError: false,
+        usernameHelperText: '' 
+      });
+      
+      //check for password
       if(passwordState.password.length < 6){
         setPassword({ 
           ...passwordState, 
@@ -104,7 +115,9 @@ const LoginInfoForm = () => {
         });
         return false
       }
-      else if(passwordState.confirm_password !== passwordState.password){
+  
+      
+      if(passwordState.confirm_password !== passwordState.password){
         setPassword({ 
           ...passwordState, 
           passwordHasError: true, 
@@ -112,15 +125,25 @@ const LoginInfoForm = () => {
         });
         return false
       }
-      else{
+      
+      if((passwordState.confirm_password || passwordState.password) === usernameState.username){
         setPassword({ 
           ...passwordState, 
-          passwordHasError: false,
-          passwordHelperText: '' 
+          passwordHasError: true, 
+          passwordHelperText: 'Please pick a more secure password' 
         });
+        return false
       }
-    }).then(result => {
-      checked = (result === false? false: true)
+
+      setPassword({ 
+        ...passwordState, 
+        passwordHasError: false,
+        passwordHelperText: '' 
+      });
+
+      return true
+    }).then(result => {  
+      checked = result ? true : false 
     })
     
     return checked
@@ -190,7 +213,7 @@ const LoginInfoForm = () => {
         <TextField 
           required 
           variant="outlined" 
-          label="Password"
+          label="Confirm Password"
           type={passwordState.showPassword ? 'text' : 'password'}
           defaultValue={passwordState.confirm_password}
           error={passwordState.passwordHasError}

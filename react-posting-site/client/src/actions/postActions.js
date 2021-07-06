@@ -1,15 +1,17 @@
 import {
   FETCH_POSTS, 
+  FETCH_USER_POSTS,
   FETCH_POSTS_FAILED,
   NEW_POST_SENDING,
   NEW_POST_SENT, 
   POST_ERRORS,
   DELETE_POST, 
   UPDATE_POST,
-  RESET_POSTS,
   POSTS_LOADING,
   SET_SUCCESS_MESSAGE,
-  CLEAR_SUCCESS_MESSAGE
+  CLEAR_SUCCESS_MESSAGE,
+  CLEAR_USER_POSTS,
+  CLEAR_POSTS
 } from './types'
 import axios from 'axios'
 import { tokenConfig } from '../actions/authActions'
@@ -18,16 +20,23 @@ const url = "/v1/posts/"
 
 export const fetchPosts = (username) => dispatch => { 
   
-  dispatch({type: RESET_POSTS});
   dispatch({type: POSTS_LOADING});
 
   let query = url+ (username ? `?user=${username}` : '')
 
-  axios.get(query).then(res => dispatch({
-      type: FETCH_POSTS,
-      posts: res.data
-    })
-  ).catch(err=>{
+  axios.get(query).then(res => {
+    if(!username){
+      dispatch({
+        type: FETCH_POSTS,
+        posts: res.data
+      })
+    }else{
+      dispatch({
+        type: FETCH_USER_POSTS,
+        userPosts: res.data
+      })
+    }
+  }).catch(err=>{
     if(err){
       dispatch({
         type: FETCH_POSTS_FAILED,
@@ -58,10 +67,11 @@ export const createPost = (postData) => (dispatch, getState) => {
   }
   
   axios.post(url,formData,postConfig).then(res => {
+
       dispatch({
         type: NEW_POST_SENT,
         post: res.data.post
-      })   
+      }) 
       
       dispatch({
         type: SET_SUCCESS_MESSAGE,
@@ -124,3 +134,10 @@ export const deletePost = (postId) => (dispatch, getState) => {
   })     
 }
 
+export const clearUserPosts = () => (dispatch) => {
+  dispatch({type: CLEAR_USER_POSTS})
+}
+
+export const clearPosts = () => (dispatch) => {
+  dispatch({type: CLEAR_POSTS})
+}

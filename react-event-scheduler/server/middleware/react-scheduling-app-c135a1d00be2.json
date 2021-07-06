@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "react-scheduling-app",
+  "private_key_id": "c135a1d00be2217c14981119082c9f48a8183ec2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCwrdrLEqLpt6Z4\ncN2qB368RpyYdhD6KB1rNFXjQGoqjyGiHvCQyhkUxJdoCEuE49/zXszHtiG0a16g\nrK4rwPL9qXSPQ1/glVmGN24etEeugj62VA1T9s/rz/SLA+bEfWLX/4vbH+MqxyJY\n+vLv2i8YrooWj3VuJHFt+iVF9uRD3kQhg/+fJa4Vx/elFxECNdzbEI18qzsyEQs4\nlxQg00aCnnOcp1Wwe44Xiju8txb1088L2xq90BCDPOONvvlgYCDGEa9yYLfeIxyO\nPzRbPuhYdsf/rkJ94Vz7La/KKvpf4bvXEzmGdpB0CuisJicHHrMtORxdzif4zDj6\nKShc6RbVAgMBAAECggEABWdGchV/fq8Lhqgfr2E2orgfdpjjILN0tYr5Ns+z2i9c\nc6KHRaEDWVuV1yxXGu5ZMrlAgWR0QsSnNTodbYsjeKyOZbSazGSPmLI99O8bOMlq\nSkCR08flngGof06UPTLUgLn5DgTl+VtJFU2U0SRsHPt25QUS2KvWqEARPxgzl6Zk\niZnQ2wx/ef/0NFeNbBTg+0plnOrYtIKDbCN1fGSDxt6dl+yFBZTLsp6BjPn45So9\n0XEAPExviMzTYIoWwkTZXOgHThtPXi3Im7dD0MV8B/aAqAgTpxUbf+rt6/vFmKQ+\n66j8Zh+pnBKqxw7C39IfFiCY14pybdat780JvlGZAQKBgQDg6bnv8StLGyC7XU99\nZnAk23fW35F1ZydMl1UyjdA78bhKbELXbHvyYW1/hgosc2br5BvO8mpDgT3mkL5G\nIlpfKpzKAcm5NV2hiWYBmYSEgO1694b4IhpiQfUmf/E2PX0fuoc31J5lwlV9mrWI\nfHWA9Nr1Pg3w5zHu2B584M7OwQKBgQDJGW5h/kVV7iqi+YQrOF19DcSesHS3nMbt\na8yNKwuI1dHLM3GHJppUpO3BAWQAoXHT/yeEVnH0sxorsDlfBuVnd0LNPYHRNmWs\nNrgincyt/fSYMVCAESzJHwEKLIFYSHmG9sua8tkCfsEaTAnlWo1oLDtfmkkjZ81S\niz8NUVthFQKBgQDBZtpXxLdovywXUba/6211lC9p2xe2r/wwNVWywhWU5leFz7Bu\nlD/E/hhtdzKaZKXVJHLxMq1D3QgAkui7YGD7wqXOY1k2ZPhdpsvLhlpYopETk3RB\nPPoZEgSflZczAA7vULNjw/ZtJH3lIzsE4ZkdSfBawIC2begXLUqSMbJEQQKBgQCA\nFnmvYvSo0gVIPyOHH+S0NWPKK9x74xj1upbUR9mV85MoGYEzM0xTo6VoLMmUeUB2\nZmu2KBV3ZejCcQFp3IubxmO/NHEOX9aMxWGtctMe88Wqdqaum8Hp7JyN7WEJaUg2\nxdVTwWCl7TRz2oDnHDE7bAj5UN1K9t/ZtqWXhv1sLQKBgC3P2+/dnj3DCxNiIJlB\nYKJJ9tWP8/MexWjXS9KGOImbl8GcjNappkOdJY70csE1FLhUY8v+gZUKNQo1gddC\nyjW1/Zv7K2DlWvFJ5h+WsNq9CfJqhsiStK9j5yxRi+cQbHbl9QGKQ32xtxqlO+ki\nnTnHhUMkd7DPxGMqfM63QsAf\n-----END PRIVATE KEY-----\n",
+  "client_email": "schedule-master@react-scheduling-app.iam.gserviceaccount.com",
+  "client_id": "100999272223414911673",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/schedule-master%40react-scheduling-app.iam.gserviceaccount.com"
+}

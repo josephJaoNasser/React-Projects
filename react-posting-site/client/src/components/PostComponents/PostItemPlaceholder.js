@@ -10,7 +10,7 @@ import {
 
 const PostItemPlaceholder = () => {
   return (
-    <ListItem alignItems="flex-start" divider>
+    <ListItem alignItems="flex-start" divider style={{minHeight: '200px'}}>
       <ListItemAvatar>
         <Avatar alt='' src=''></Avatar>
       </ListItemAvatar>

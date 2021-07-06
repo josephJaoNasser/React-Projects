@@ -1,12 +1,14 @@
 import { 
   FETCH_POSTS, 
+  FETCH_USER_POSTS, 
   FETCH_POSTS_FAILED,
   NEW_POST_SENDING,
   NEW_POST_SENT,
   POST_ERRORS, 
   DELETE_POST, 
   UPDATE_POST,
-  RESET_POSTS,
+  CLEAR_POSTS,
+  CLEAR_USER_POSTS,
   POSTS_LOADING,
   SET_SUCCESS_MESSAGE,
   CLEAR_SUCCESS_MESSAGE,
@@ -15,6 +17,7 @@ import {
 
 const initialState = {
   posts: [],
+  userPosts: [],
   isLoading: false,
   isSendingPost: false,
   error: null,
@@ -28,6 +31,13 @@ const postReducer = (state = initialState, action) => {
       return {
         ...state,
         posts: action.posts,
+        isLoading: false
+      };
+      
+    case FETCH_USER_POSTS:      
+      return {
+        ...state,
+        userPosts: action.userPosts,
         isLoading: false
       };
 
@@ -50,20 +60,23 @@ const postReducer = (state = initialState, action) => {
         isSendingPost: false,
         isLoading: false,
         posts: [action.post, ...state.posts],
+        userPosts: [action.post, ...state.userPosts],
         error: null
       };
-    
+        
     case UPDATE_POST: 
       return {
         ...state,
         posts: state.posts.map(post => post._id === action.post._id ? action.post : post),
+        userPosts: state.posts.map(post => post._id === action.post._id ? action.post : post),
         isLoading:false
       }
 
     case DELETE_POST:
       return {
         ...state,
-        posts: state.posts.filter(post => post._id !== action.id)
+        posts: state.posts.filter(post => post._id !== action.id),
+        userPosts: state.posts.filter(post => post._id !== action.id)
       };
 
     case POSTS_LOADING:
@@ -72,10 +85,16 @@ const postReducer = (state = initialState, action) => {
         isLoading: true
       };
 
-    case RESET_POSTS:
+    case CLEAR_POSTS:
       return {
         ...state,
         posts: []
+      }
+
+    case CLEAR_USER_POSTS:
+      return {
+        ...state,
+        userPosts: []
       }
 
     case POST_ERRORS:

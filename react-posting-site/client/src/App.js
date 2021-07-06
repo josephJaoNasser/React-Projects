@@ -6,19 +6,21 @@ import { CircularProgress, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 //theme provider
-import { ThemeContext } from './components/ThemeContext'
+import ThemeContext from './components/ThemeContext'
 
 //router
 import { 
   BrowserRouter as Router, 
   Route, 
   Redirect, 
-  Switch 
+  Switch,
 } from 'react-router-dom'
 
 //redux
 import { connect } from 'react-redux'
 import { loadUser } from './actions/authActions'
+
+//components
 import NavigationPlaceholder from './components/NavigationPlaceholder';
 
 //routes
@@ -27,9 +29,9 @@ const Login = lazy(()=>import('./components/routes/Login'))
 const Register = lazy(()=>import('./components/routes/Register'))
 const Profile = lazy(()=>import('./components/routes/Profile'))
 const About = lazy(()=>import('./components/routes/About'))
+const NotFound = lazy(()=>import('./components/routes/NotFound'))
 
-
-//components
+//lazy components
 const Navigation = lazy(()=> import('./components/Navigation')) 
 
 //material ui styling
@@ -85,7 +87,7 @@ function App(props) {
   return (    
     <div className="App">    
       <ThemeContext>
-        <Paper style={{height: '100vh',overflowY: 'auto'}}>        
+        <Paper style={{height: '100vh',overflowY: 'auto', borderRadius: 0}}>        
           <Router>          
             <div className={classes.mainContainer}>        
               {
@@ -111,20 +113,24 @@ function App(props) {
                     { checkGuest(<Home/>) }
                   </Route> 
 
-                  <Route path="/login">
+                  <Route path="/login" exact>
                     { checkLoggedIn('/',<Login/>) }  
                   </Route>     
 
-                  <Route path="/register">
+                  <Route path="/register" exact>
                     { checkLoggedIn('/',<Register/>) }
                   </Route>
 
-                  <Route path="/about">
+                  <Route path="/about" exact>
                     <About/>
                   </Route>
 
-                  <Route path="/:username">
-                    <Profile/>  
+                  <Route path="/:username" exact>
+                    <Profile/>
+                  </Route>
+
+                  <Route path="*">
+                    <NotFound/>
                   </Route>
 
                 </Switch>

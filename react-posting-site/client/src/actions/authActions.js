@@ -10,7 +10,9 @@ import {
   USERS_LOADING,
   USERS_LOADED,
   AUTH_ERROR,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  CLEAR_POSTS,
+  CLEAR_USER_POSTS
 } from './types'
 
 import axios from 'axios'
@@ -96,6 +98,14 @@ export const login = (user) => dispatch => {
 export const logout = () => dispatch => {
   dispatch({
     type: LOGOUT_REQUEST
+  })
+
+  dispatch({
+    type: CLEAR_POSTS
+  })
+
+  dispatch({
+    type: CLEAR_USER_POSTS
   })
 
   dispatch({

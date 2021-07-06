@@ -13,7 +13,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 //redux
 import { connect } from 'react-redux'
-import { fetchPosts, deletePost, editPost } from '../../actions/postActions'
+import { fetchPosts, deletePost, editPost, clearUserPosts } from '../../actions/postActions'
 
 
 const Alert = (props) => {
@@ -31,8 +31,10 @@ const PostList = (props) => {
     editPost,
     error,
     fetchPosts,
+    clearUserPosts,
     isLoading,
     posts,
+    userPosts,
     successMessage
   } = props
   //---lifecycle functions ---
@@ -42,6 +44,12 @@ const PostList = (props) => {
     }
     getPosts()
   },[fetchPosts, username])
+
+  useEffect(()=> {       
+    return () => {
+      clearUserPosts()
+    }
+  },[clearUserPosts])
   
 
   // --- html ---
@@ -59,7 +67,21 @@ const PostList = (props) => {
       }
       <List>
         { 
-          posts?.length ?
+          (userPosts?.length && username) ?
+            userPosts.map((post) => (  
+              <Suspense key={post._id} fallback={<PostItemPlaceholder/>}>
+                <PostItem    
+                  key={post._id} 
+                  post={post}  
+                  onDelete={id => deletePost(id)}
+                  onEdit={(id, changes)=> editPost(id, changes)}
+                  onDoubleClick={()=>{}}            
+                />
+              </Suspense>                       
+            ))
+          
+          :  
+          (posts?.length && !username) ?
             posts.map((post) => (  
               <Suspense key={post._id} fallback={<PostItemPlaceholder/>}>
                 <PostItem    
@@ -72,7 +94,7 @@ const PostList = (props) => {
               </Suspense>                       
             ))
           
-          : "..." 
+          : "..."  
         }
       </List>   
       <Snackbar
@@ -103,6 +125,7 @@ PostList.propTypes = {
   deletePost: PropTypes.func,
   editPost: PropTypes.func,
   posts: PropTypes.array.isRequired,
+  userPosts: PropTypes.array,
   isLoading: PropTypes.bool,
   error: PropTypes.object,
   successMessage: PropTypes.string
@@ -110,9 +133,10 @@ PostList.propTypes = {
 
 const mapStateToProps = state => ({
   posts: state.posts.posts,
+  userPosts: state.posts.userPosts,
   isLoading: state.posts.isLoading,
   error: state.posts.error,
   successMessage: state.posts.successMessage
-})  
+})
 
-export default connect(mapStateToProps, { fetchPosts, deletePost, editPost })(PostList)
+export default connect(mapStateToProps, { fetchPosts, deletePost, editPost, clearUserPosts })(PostList)

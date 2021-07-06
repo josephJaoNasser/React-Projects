@@ -1,19 +1,16 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react'
+import React, { lazy, Suspense, useState, useMemo } from 'react'
 import axios from 'axios'
 
 //react router
-import { useParams } from 'react-router-dom'
+import { useParams, Redirect } from 'react-router-dom'
 
 //material ui
 import {
-  Avatar,
   Container,
   CircularProgress,
-  Divider,
-  Card,
-  Typography
+  Divider
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles';
+
 
 //redux
 import { connect } from 'react-redux'
@@ -24,55 +21,24 @@ import { ImageAttatchmentsContext } from '../AttatchmentsContext'
 //components
 const PostList = lazy(()=> import('../PostComponents/PostList'))
 const AddPost = lazy(()=> import('../PostComponents/AddPost'))
-
-//material ui styling
-const useStyles = makeStyles(theme=> ({
-  avatar:{
-    width: theme.spacing(15),
-    height: theme.spacing(15)
-  },
-  userInfoContainer: {
-    padding: theme.spacing(3),
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(4),
-    borderRadius: 20,
-    display: 'flex'
-  }
-}))
+const UserProfileCard = lazy(()=> import('../UserProfileCard'))
 
 export const Profile = ({currentUser}) => {
   const params = useParams()
-  const [user, setUser] = useState({})
-  const classes = useStyles()
+  const [user, setUser] = useState({})  
   const url = `/v1/users/?username=${params.username}`
-  const profilImageUrl = user.profile_image ? `/v1/users/${user._id}/profile-image/${user.profile_image}?size=medium` : ''
-  
-  useEffect(() => {
-    axios.get(url)
-      .then(res => {
-        setUser(res.data.user)
-      })
-  }, [params, url])  
- 
+  useMemo(() => {
+    setUser({})
+    getUser(url).then(data => setUser(data))
+  }, [url])
+
+  if(!user){
+    return(<Redirect to='*'/>)
+  }
+   
   return (
-    <Container maxWidth='md'>
-      <Card 
-        className={classes.userInfoContainer}
-        elevation={3}
-      >
-        <Suspense
-          fallback={<CircularProgress/>}
-        >
-          <Avatar 
-            src={profilImageUrl} 
-            alt='profile image'
-            className={classes.avatar}
-          />
-          <Typography variant='h4' style={{flexGrow: 1}}>
-            <strong>{user.dname}</strong>
-          </Typography>
-        </Suspense>
-      </Card>
+    <Container maxWidth='md'>      
+      <UserProfileCard user={user} loggedInUser={currentUser}/>
       {
         currentUser?.uname === params.username ?
         <ImageAttatchmentsContext>
@@ -90,6 +56,11 @@ export const Profile = ({currentUser}) => {
   )
 }
 
+const getUser = (url) => {  
+  return axios.get(url).then(res => {
+    return res.data.user
+  })
+}
 
 const mapStateToProps = (state) => ({
   currentUser: state.auth.user

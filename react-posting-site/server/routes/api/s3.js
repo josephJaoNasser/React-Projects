@@ -14,18 +14,13 @@ const s3 = new S3({
 
 // upload
 const uploadFiles = async (files, bucket) => {
-  const params =[]
-
-  files.forEach(file => {
-    const fileStream = streamifier.createReadStream(file.buffer)
-    const uploadParams = {
+  const params = files.map(file => (
+    {
       Bucket: bucket,
-      Body: fileStream,
+      Body: streamifier.createReadStream(file.buffer),
       Key: file.filename
     }
-
-    params.push(uploadParams)
-  })  
+  ))  
 
   const res = await Promise.all(
     params.map(param => s3.upload(param).promise())
@@ -43,8 +38,12 @@ const getFile = async (fileKey, bucket) => {
     Bucket: bucket
   }
   
-  const res = await s3.getObject(downloadParams).createReadStream()
-  return res
+  try{
+    const res = await s3.getObject(downloadParams).createReadStream()
+    return res
+  }catch(err){
+    return console.error('Error occured from S3 getFile function',err)
+  }
 }
 
 

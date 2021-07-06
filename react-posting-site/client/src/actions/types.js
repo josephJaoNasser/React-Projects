@@ -4,6 +4,7 @@
 
 // CRUD for Posts
 export const FETCH_POSTS = 'FETCH_POSTS';
+export const FETCH_USER_POSTS = 'FETCH_USER_POSTS';
 export const FETCH_POSTS_FAILED = 'FETCH_POSTS_FAILED';
 export const NEW_POST_SENDING = 'NEW_POST_SENDING'
 export const NEW_POST_SENT = 'NEW_POST'
@@ -11,7 +12,8 @@ export const UPDATE_POST = 'UPDATE_POST'
 export const DELETE_POST = 'DELETE_POST'
 
 // reset posts
-export const RESET_POSTS = 'RESET_POSTS'
+export const CLEAR_POSTS = 'CLEAR_POSTS'
+export const CLEAR_USER_POSTS = 'CLEAR_USER_POSTS'
 
 // Loading states
 export const POSTS_LOADING = 'POSTS_LOADING'

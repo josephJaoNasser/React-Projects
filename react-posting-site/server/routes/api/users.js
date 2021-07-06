@@ -48,11 +48,13 @@ router.get('/',(req, res)=> {
       })
     }
     else{
-      return res.status(404).json({
+      return res.status(200).json({ 
         msg: 'User not found'
       })
     }
   })
+
+  
 })
 
 // @route GET api/users/profile_image

@@ -8,17 +8,10 @@ import {
 const ImageGrid = ({ postid, images }) => {
   const url = 'v1/posts/'
   return (
-    // <div style={styles}>
-    //   {images.map((image,index) => (
-    //     <div key={image} >
-    //       <img src={`${url}${postid}/media/${image}?size=small`} alt={image.title} />
-    //     </div>
-    //   ))}
-    // </div>
     <GridList cols={2} rows={2}>
       {images.map((image,index) => (
         <GridListTile key={image} >
-          <img src={`${url}${postid}/media/${image}?size=small`} alt={image.title} />
+          <img src={`${url}${postid}/media/${image}?size=medium`} alt={image.title} />
         </GridListTile>
       ))}
     </GridList>
