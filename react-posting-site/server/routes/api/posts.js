@@ -139,8 +139,6 @@ const uploadPostMedia = (files) => {
 router.post('/', auth, uploadToMemory, async(req, res)=> {
   
   const parsedBody = JSON.parse(req.body.postData)
-
-  let uploadResult
   let mediaKeys =[]
 
   if(req.files){
@@ -151,7 +149,7 @@ router.post('/', auth, uploadToMemory, async(req, res)=> {
     })   
   
     //upload the files
-    uploadResult = await uploadPostMedia(req.files)
+    uploadPostMedia(req.files)
     .catch(err => {
         return res.status(404).json({
         msg: 'An error has occurred while uploading an image/s',

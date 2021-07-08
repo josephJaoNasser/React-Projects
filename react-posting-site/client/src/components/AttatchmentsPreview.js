@@ -1,5 +1,3 @@
-import React from 'react'
-
 //context providers
 import { useImageAttatchments, useUpdateImageAttatchments } from './AttatchmentsContext'
 

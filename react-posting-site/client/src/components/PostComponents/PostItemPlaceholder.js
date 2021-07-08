@@ -1,4 +1,4 @@
-import React from 'react'
+import { Fragment } from 'react'
 
 import {  
   Avatar,
@@ -21,9 +21,9 @@ const PostItemPlaceholder = () => {
       }}>  
         <div className='contents-body'>
           <ListItemText 
-            primary={<React.Fragment>
+            primary={<Fragment>
               <LinearProgress/>
-            </React.Fragment>}
+            </Fragment>}
           /> 
         </div>
 

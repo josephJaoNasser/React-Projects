@@ -8,7 +8,7 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const { validateUser } = require('./validateUser')
 const jwt = require('jsonwebtoken')
-const imageCompressor = require('./image-compressor')
+const imageCompressorv2 = require('./image-compressor_v2')
 
 //user model
 const User = require('../../models/User')
@@ -52,7 +52,7 @@ router.get('/',(req, res)=> {
         msg: 'User not found'
       })
     }
-  })
+  }).catch(err => (res.status(404).send(err)))
 
   
 })
@@ -152,19 +152,16 @@ router.get('/:userId/profile-image/:mediaKey', async(req, res)=> {
 // @function uploadProfileImage()
 // @desc uploads a profile image for a user
 // @access public
-const uploadProfileImage = async (file) => {
-  const images = await imageCompressor.compressSingle(file)
-
-  if(images.error){
-    return res.status(404).json({
-      msg: 'An error has occurred while uploading an image',
-      error: images.error
-    })
-  }
-  
-  const res = await uploadFiles(images, profileImageBucket)
-  
-  return res
+const uploadProfileImage = (file) => {
+  return new Promise((resolve, reject) => {
+    imageCompressorv2.compressSingle(file).then(images => {
+      try{
+        uploadFiles([...images, file], profileImageBucket).then(res => resolve(res))
+      }catch(err){
+        return reject(err)
+      }
+    }).catch(err => reject(err))
+  })
 }
 
 // @route POST api/users
@@ -206,7 +203,14 @@ router.post('/register', uploadToMemory, async(req, res)=> {
   const hashedPassword = await bcrypt.hash(password, passwordSalt).catch(err=> { if(err) throw err })    
 
   //upload the profile image
-  const uploadResult = await uploadProfileImage(req.file)
+  const uploadResult = await uploadProfileImage(req.file).catch(err => {
+    console.error(err)
+    return res.status(404).json({
+      error: err,
+      msg: 'An error has occurred while uploading the profile image'
+    })
+  })
+  
   const profileImageUrl = uploadResult.find(o => o.key === req.file.filename).Location
 
   //add the hashed password and image url
@@ -214,7 +218,7 @@ router.post('/register', uploadToMemory, async(req, res)=> {
   newUser.profile_image_url = profileImageUrl
 
   //save to db
-  const user = await  newUser.save().catch(err=>{
+  const user = await newUser.save().catch(err=>{
     if(err) throw err
     return res.status(400).json({
       msg: "Something went wrong!",

@@ -1,7 +1,7 @@
-import React,{ useContext } from 'react'
+import { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { StepperContext, SetActiveStepFunction } from '../routes/Register'
-import {  Button } from '@material-ui/core';
+import {  Button, CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,6 +16,7 @@ const StepperControls = ({ canProceed, onNext, checkIfCanProceed }) => {
 
   const setActiveStep = useContext(SetActiveStepFunction)
   const { activeStep, stepList } = useContext(StepperContext)
+  const [isProcessing, setIsProcessing] = useState(false)
   const classes = useStyles();
   const steps = stepList; 
 
@@ -28,8 +29,11 @@ const StepperControls = ({ canProceed, onNext, checkIfCanProceed }) => {
   };
 
   const handleNext = async() => {
+    setIsProcessing(true)
+    
     if( checkIfCanProceed ){
       canProceed = await checkIfCanProceed()  
+      setIsProcessing(false)
     }
     
     if(canProceed){
@@ -38,7 +42,7 @@ const StepperControls = ({ canProceed, onNext, checkIfCanProceed }) => {
       }
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
-      
+     
   };
 
   return (
@@ -61,8 +65,13 @@ const StepperControls = ({ canProceed, onNext, checkIfCanProceed }) => {
               variant="contained" 
               color="primary" 
               onClick={handleNext}
+              disabled={isProcessing}
             >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              {
+                /* if */activeStep === steps.length - 1 ? 'Finish' 
+                /* else if */: !isProcessing ? "Next" 
+                /* else */: <CircularProgress size={25}/>
+              }
             </Button>
           </div>
         </div>

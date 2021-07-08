@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react'
+import { useState, createContext, useContext } from 'react'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 //import { connect } from 'react-redux'

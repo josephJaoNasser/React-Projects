@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import PropTypes from 'prop-types'
 import PostItemPlaceholder from './PostItemPlaceholder';
 

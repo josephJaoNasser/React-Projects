@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState, useMemo } from 'react'
+import { lazy, Suspense, useState, useMemo } from 'react'
 import axios from 'axios'
 
 //react router

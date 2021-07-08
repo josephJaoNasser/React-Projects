@@ -1,8 +1,8 @@
-import React, {useContext, useState, useEffect} from 'react'
+import {useContext, useState, useEffect, createContext} from 'react'
 import axios from 'axios';
 
-const PostContext = React.createContext()
-const SetPostFunction = React.createContext()
+const PostContext = createContext()
+const SetPostFunction = createContext()
 
 //hooks
 export function usePost(){

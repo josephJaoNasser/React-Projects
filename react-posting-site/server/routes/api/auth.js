@@ -65,7 +65,7 @@ router.post('/login', (req, res)=>{
         }
       )
     })
-  })  
+  }).catch(err => (res.status(404).send({...err})))
 })
 
 // @route GET v1/auth/user
@@ -76,5 +76,5 @@ router.get('/user',auth,(req,res)=>{
     .select('-pwd -joinedOn')
     .then(user => {
       return res.json(user)
-    })
+    }).catch(err => (res.status(404).send(err)))
 })

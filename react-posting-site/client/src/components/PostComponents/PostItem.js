@@ -1,4 +1,4 @@
-import React, { lazy, useState } from 'react'
+import { lazy, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import moment from 'moment'
@@ -36,7 +36,9 @@ const ImageGrid = lazy(()=> import('./ImageGrid'))
 const DeletePost = lazy(()=> import('./DeletePost'))
 const EditPost = lazy(()=> import('./EditPost'))
 
-//main
+/********************
+ *  component main 
+ ********************/
 const PostItem = ({post, onDelete, onEdit}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)

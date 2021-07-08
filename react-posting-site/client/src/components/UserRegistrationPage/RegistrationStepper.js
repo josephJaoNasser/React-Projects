@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { StepperContext } from '../routes/Register'
 import {

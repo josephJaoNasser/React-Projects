@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { UserInfoState } from '../routes/Register'
 import StepperControls from './StepperControls'
 import axios from 'axios'
