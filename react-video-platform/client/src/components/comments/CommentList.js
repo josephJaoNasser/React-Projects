@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from 'react'
 import { connect } from 'react-redux'
 import { fetchComments } from '../../actions/commentActions'
 import { List } from '@material-ui/core'
+import CommentItemPlaceholder from './CommentItemPlaceholder'
 
 const CommentItem = lazy(()=>import('./ComentItem'))
 
@@ -23,7 +24,7 @@ const CommentList = ({ post, comments, fetchComments}) => {
     <List>
       { comments?.length ?
           comments.map(comment => (
-            <Suspense fallback={'...'} key={comment._id}>
+            <Suspense fallback={<CommentItemPlaceholder/>} key={comment._id}>
               <CommentItem comment={comment} key={comment._id}/>
             </Suspense>
           ))

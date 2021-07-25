@@ -1,43 +1,27 @@
-import { Fragment } from 'react'
-import PropTypes from 'prop-types'
+import TextLinePlaceholder from './TextLinePlaceholder'
 import { 
   Avatar,
   ListItem,
   ListItemAvatar,
-  ListItemText,
-  Typography
 } from '@material-ui/core'
 
-const ComentItem = () => {
+
+const CommentItemPlaceholder = () => {
   return (
     <ListItem style={{marginBottom: 10}}>
       <ListItemAvatar>
         <Avatar src="" />
-      </ListItemAvatar>      
-      <ListItemText
-        primary={
-          <Fragment>
-            <div style={{
-              height:40,
-              width: '100%'
-            }}></div>
-          </Fragment>
-        }
-        secondary={
-          <Fragment>
-            <div style={{
-              height:40,
-              width: '100%'
-            }}></div>
-          </Fragment>
-        }
-      />        
+      </ListItemAvatar>
+      
+      <div style={{width:'100%', height: '100%'}}>
+        <TextLinePlaceholder width="10%"/>
+        <TextLinePlaceholder lines={2}/>
+      </div>
+      
+      
     </ListItem>
   )
 }
 
-ComentItem.propTypes = {
-  comment: PropTypes.object
-}
 
-export default ComentItem
+export default CommentItemPlaceholder
