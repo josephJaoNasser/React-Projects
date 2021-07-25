@@ -1,10 +1,12 @@
-import CommentList from './CommentList'
-import { Typography } from '@material-ui/core'
+import { lazy, Suspense } from 'react'
+import { Typography, Container, CircularProgress } from '@material-ui/core'
 import PostComment from './PostComment'
+
+const CommentList = lazy(()=> import('./CommentList'))
 
 const CommentSection = ({ post }) => { 
   return (
-    <div>
+    <Container maxWidth='md'>
       <Typography variant='h6' align='left' gutterBottom>
         Comments
       </Typography>
@@ -12,8 +14,10 @@ const CommentSection = ({ post }) => {
       <PostComment post={post}/>
 
       <br/>
-      <CommentList post={post}/>
-    </div>
+      <Suspense fallback={<CircularProgress/>}>
+        <CommentList post={post}/>
+      </Suspense>
+    </Container>
   )
 }
 

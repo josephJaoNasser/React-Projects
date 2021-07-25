@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense, lazy } from 'react'
 import { useLocation } from 'react-router-dom'
 import VideoPlayer from '../videoPlayer/VideoPlayer'
 import VideoInfoContainer from '../videoPage/VideoInfoContainer'
 import CommentSection from '../comments/CommentSection'
 import { 
-  Container
+  CircularProgress,
+  Container,
 } from '@material-ui/core'
 import axios from 'axios'
+
+const VideoList = lazy(()=>import('../videoList/VideoList'))
 
 const VideoPage = () => {
   const videoKey = new URLSearchParams(useLocation().search).get('video')
@@ -28,15 +31,20 @@ const VideoPage = () => {
 
   return (
     <Container maxWidth='lg'>
-      <VideoPlayer
-        src={video.url}
-        playByDefault={true}
-        muteByDefault={true}
-      />
-      <br/>
-      <VideoInfoContainer videoInfo={video}/>
-      <br/>
-      <CommentSection post={video._id}/>
+      <div>
+        <VideoPlayer
+          src={video.url}
+          playByDefault={true}
+          muteByDefault={true}
+        />
+        <br/>
+        <VideoInfoContainer videoInfo={video}/>
+        <br/>
+        <CommentSection post={video._id}/>
+      </div>
+      <Suspense fallback={<CircularProgress/>}>
+        <VideoList headerText='More Videos'/>
+      </Suspense>
     </Container>
   )
 }
